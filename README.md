@@ -1,6 +1,7 @@
 # musicplayer
 
 > A Vue.js project
+> 一个音乐播放器
 
 ## Build Setup
 

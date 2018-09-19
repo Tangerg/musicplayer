@@ -99,20 +99,21 @@
           background $color-background-black
           opacity 0.6
       .player-top
-        position relative
+        position absolute
+        width 100%
         display flex
         align-items center
         box-sizing border-box
-        height 50px
+        height 10%
         .back
-          flex 0 0 50px;
+          flex 0 0 60px
           text-align center
           height 50px
           line-height 50px
           color $color-text-white
           .icon-left
             font-size 25px
-            color $color-theme-l
+            color $color-theme
         .title-subtitle
           flex 1
           height 50px

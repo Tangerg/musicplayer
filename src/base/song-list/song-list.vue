@@ -1,12 +1,12 @@
 <template>
     <div class="song-list">
-      <div class="sequence-play" @click="playAll">
+      <div class="sequence-play" @click.stop="playAll">
         <i class="iconfont icon-zanting"></i>
         <span class="text">播放全部</span>
         <span class="count">(共{{totalNumber}}首)</span>
       </div>
       <ul>
-        <li class="list-item" v-for="(song, index) in songs" :key="song.id" @click="selectItem(song, index)">
+        <li class="list-item" v-for="(song, index) in songs" :key="song.id" @click.stop="selectItem(song, index)">
           <p class="rank">{{index + 1}}</p>
           <div class="content">
             <h2 class="name">{{song.name}}</h2>
@@ -32,7 +32,7 @@
       },
       methods:{
         playAll(){
-          this.$emit('select')
+          this.$emit('selectAll')
         },
         selectItem (item, index) {
           this.$emit('select', item, index)
@@ -93,7 +93,6 @@
           height 30px
           line-height 30px
           font-size $font-size-medium
-          font-weight bold
           color $color-text-black
         .desc
           no-wrap()

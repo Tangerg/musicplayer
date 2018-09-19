@@ -21,7 +21,7 @@
             </div>
           </div>
           <div class="song-list-wrapper">
-            <song-list :songs="playList"></song-list>
+            <song-list :songs="playList" @select="selectItem" @selectAll="playAll"></song-list>
           </div>
       </div>
     </scroll>
@@ -37,12 +37,15 @@
 
   import SongList from '../../base/song-list/song-list'
     export default {
-    data() {
-      return {
-        playList:[],
-        headerTitle: '歌单'
-      }
-    },
+      data() {
+        return {
+          playList:[],
+          headerTitle: '歌单'
+        }
+      },
+      created(){
+        this._initMusiclist(this.musicList.id)
+      },
       computed:{
         ...mapGetters([
           'musicList'
@@ -73,11 +76,8 @@
         SongList,
         Scroll
       },
-      created(){
-        this._initMusiclist(this.musicList.id)
-      },
       methods:{
-        _initMusiclist(id){
+        _initMusiclist( id){
           if (!id) {
             this.$router.push('/home/recommend')
             return
@@ -93,7 +93,10 @@
         _back(){
           this.$router.back()
         },
-
+        selectItem(){
+        },
+        playAll(){
+        }
 
       },
 
@@ -106,7 +109,7 @@
   @import "../../common/stylus/mixin"
   .music-list
     position fixed
-    z-index 999
+    z-index 200
     top 0
     left 0
     bottom 0

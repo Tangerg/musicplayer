@@ -16,6 +16,12 @@ const mutations = {
   [types.SET_CURRENT_INDEX] (state, index) {
     state.currentIndex = index ? index : 0
   },
+  [types.SET_FULL_SCREEN] (state, flag) {
+    state.fullScreen = flag
+  },
+  [types.SET_PLAYING_MODE] (state, mode) {
+    state.playMode = mode
+  },
 }
 
 export default mutations

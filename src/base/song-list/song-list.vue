@@ -1,7 +1,7 @@
 <template>
     <div class="song-list">
       <div class="sequence-play" @click.stop="playAll">
-        <i class="iconfont icon-zanting"></i>
+        <i class="iconfont icon-play2"></i>
         <span class="text">播放全部</span>
         <span class="count">(共{{totalNumber}}首)</span>
       </div>
@@ -52,7 +52,7 @@
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
   .song-list
-    background-color $color-background-gray-d
+    background-color $color-background-white
     width 100%
     border-radius 10px 10px 0 0
     .sequence-play

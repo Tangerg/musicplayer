@@ -55,7 +55,7 @@
           if (!this.musicList.playCount) {
             return
           }
-          if (this.musicList.playCount < 1e5) {
+          if (this.musicList.playCount < 1e4) {
             return Math.floor(this.musicList.playCount)
           } else if(this.musicList.playCount < 1e8) {
             return Math.floor(this.musicList.playCount / 10000) + '万'
@@ -120,7 +120,7 @@
   @import "../../common/stylus/mixin"
   .music-list
     position fixed
-    z-index 200
+    z-index: 100
     top 0
     left 0
     bottom 0

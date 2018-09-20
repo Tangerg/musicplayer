@@ -4,7 +4,7 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
-    <!--<Mplayer></Mplayer>-->
+    <Mplayer></Mplayer>
   </div>
 </template>
 

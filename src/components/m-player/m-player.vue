@@ -1,24 +1,24 @@
 <template>
-  <div class="m-player">
-    <div class="normal-player">
+  <div class="m-player" v-show="playList.length">
+    <div class="normal-player" v-show="fullScreen">
       <div class="background">
         <div class="filter"></div>
-        <img src="http://p1.music.126.net/4xv2Jsuhe1DBkDfIeVlaYQ==/39582418616705.jpg" width="100%" height="100%">
+        <img :src="currentSong.image" width="100%" height="100%">
       </div>
       <div class="player-top">
-        <div class="back">
+        <div class="back" @click="back">
           <i class="iconfont icon-left"></i>
         </div>
         <div class="title-subtitle">
-          <h1 class="title">青花瓷</h1>
-          <h2 class="subtitle">周杰伦</h2>
+          <h1 class="title">{{currentSong.name}}</h1>
+          <h2 class="subtitle">{{currentSong.singer}}</h2>
         </div>
       </div>
       <div class="player-middle">
         <div class="middle-front">
           <div class="cd-wrapper">
             <div class="cd">
-              <img class="image" src="http://p1.music.126.net/4xv2Jsuhe1DBkDfIeVlaYQ==/39582418616705.jpg" alt="">
+              <img class="image" :src="currentSong.image" alt="">
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
             <i class="iconfont icon-backward"></i>
           </div>
           <div class="icon i-center" >
-            <i class="iconfont icon-play"></i>
+            <i @click="handlePlay" class="iconfont" :class="playIcon"></i>
           </div>
           <div class="icon i-right" >
             <i class="iconfont icon-forward"></i>
@@ -58,12 +58,92 @@
         </div>
       </div>
     </div>
+    <div  class="mini-player" v-show="!fullScreen" @click="open">
+      <div class="icon">
+        <img width="40" height="40" :src="currentSong.image">
+      </div>
+      <div class="text">
+        <h2 class="name" v-html="currentSong.name"></h2>
+        <p class="desc" v-html="currentSong.singer"></p>
+      </div>
+      <div class="control"></div>
+      <div class="control">
+        <i class="iconfont icon-play2"></i>
+      </div>
+    </div>
+    <audio id="music-audio" :src="Song.url" ref="audio" autoplay>
+    </audio>
   </div>
 </template>
 
 <script>
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import ProgressBar from '../../base/progress-bar/progress-bar'
+  import {ERR_OK} from '../../common/js/config'
+  import {getPlaySong} from '../../api/play-list'
   export default {
+    data(){
+      return{
+        Song:{},
+      }
+    },
+    computed:{
+      ...mapGetters([
+        'playList',
+        'fullScreen',
+        'sequenceList',
+        'isPlaying',
+        'currentIndex',
+        'currentSong'
+      ]),
+
+      playIcon(){
+        return this.isPlaying ? 'icon-pause' : 'icon-play'
+      }
+    },
+    created(){
+
+    },
+    watch:{
+      currentSong (newVal, oldVal) {
+        if (!newVal.id) {
+          return
+        }
+        if (newVal.id === oldVal.id) {
+          return
+        }
+        this.$refs.audio.pause()
+        this._getPlaySong(newVal.id)
+      },
+      isPlaying(Playing){
+        const audio = this.$refs.audio
+        Playing ?  audio.play() : audio.pause()
+      }
+    },
+    methods:{
+      ...mapMutations({
+        setFullScreen:'SET_FULL_SCREEN',
+        setPlayingState:'SET_PLAYING_STATE'
+      }),
+      back(){
+        this.setFullScreen(false)
+      },
+      open(){
+        this.setFullScreen(true)
+      },
+
+      handlePlay(){
+        this.setPlayingState(!this.isPlaying)
+      },
+
+      _getPlaySong(id){
+        getPlaySong(id).then((res) => {
+          if(res.code === ERR_OK){
+            this.Song = res.data[0]
+          }
+        })
+      }
+    },
     components:{
       ProgressBar
     }
@@ -75,14 +155,14 @@
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
   .m-player
-    position fixed
-    z-index 200
-    top 0
-    left 0
-    bottom 0
-    right 0
-    background $color-background-gray-d
     .normal-player
+      position fixed
+      z-index 150
+      top 0
+      left 0
+      bottom 0
+      right 0
+      background $color-background-gray-d
       .background
         position absolute
         left -50%
@@ -248,4 +328,53 @@
             &.i-right
               text-align left
 
+    .mini-player
+      display flex
+      align-items center
+      position fixed
+      left 0
+      bottom 0
+      z-index 180
+      width 100%
+      height 8%
+      background $color-background-white
+      border-top 1px solid $color-line-gray
+      .icon
+        flex: 0 0 40px
+        width: 40px
+        padding: 0 10px 0 20px
+        img
+          border-radius: 50%
+          &.play
+            animation: rotate 10s linear infinite
+          &.pause
+            animation-play-state: paused
+      .text
+        display: flex
+        flex-direction: column
+        justify-content: center
+        flex: 1
+        line-height: 20px
+        overflow: hidden
+        .name
+          margin-bottom: 2px
+          no-wrap()
+          font-size: $font-size-medium
+          color: $color-text
+        .desc
+          no-wrap()
+          font-size: $font-size-small
+          color: $color-text-black
+      .control
+        flex: 0 0 30px
+        width: 30px
+        padding: 0 10px
+        .icon-play-mini, .icon-pause-mini, .icon-playlist
+          font-size: 30px
+          color: $color-theme-d
+        .icon-mini
+          font-size: 32px
+          position: absolute
+          left: 0
+          top: 0
 </style>

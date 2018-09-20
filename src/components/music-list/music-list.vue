@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+  import {mapActions,mapGetters} from 'vuex'
   import {ERR_OK} from "../../common/js/config"
   import {getPlayList} from '../../api/play-list'
   import {creatSongList} from "../../common/classes/song";
@@ -48,7 +48,8 @@
       },
       computed:{
         ...mapGetters([
-          'musicList'
+          'musicList',
+          'sequencePlay'
         ]),
         playCount(){
           if (!this.musicList.playCount) {
@@ -77,6 +78,9 @@
         Scroll
       },
       methods:{
+        ...mapActions([
+          'selectPlay'
+        ]),
         _initMusiclist( id){
           if (!id) {
             this.$router.push('/home/recommend')
@@ -93,9 +97,16 @@
         _back(){
           this.$router.back()
         },
-        selectItem(){
+        selectItem(item,index){
+          this.selectPlay({
+            list: this.playList,
+            index: index
+          })
         },
         playAll(){
+          this.selectPlay({
+            list: this.playList,
+          })
         }
 
       },

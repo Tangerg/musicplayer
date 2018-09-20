@@ -13,7 +13,7 @@ function singerName (singers) {
     return singer.name
   })
 
-  return name.join('/')
+  return name.join(' / ')
 }
 
 export function creatSongList(music) {

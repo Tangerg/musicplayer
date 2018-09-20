@@ -106,29 +106,34 @@
         box-sizing border-box
         height 10%
         .back
-          flex 0 0 60px
+          flex 0.18
           text-align center
-          height 50px
-          line-height 50px
+          height 100%
+          display flex
+          align-items center
           color $color-text-white
           .icon-left
+            flex 1
             font-size 25px
             color $color-theme
         .title-subtitle
           flex 1
-          height 50px
+          height 100%
+          display flex
+          flex-direction column
           overflow hidden
           .title
             no-wrap()
             width 90%
-            height 30px
-            line-height 30px
+            flex 0.6
+            display flex
+            align-items center
             font-size $font-size-medium-x
             color $color-text-white
           .subtitle
             no-wrap()
             width 90%
-            height 20px
+            flex 0.4
             font-size $font-size-small
             color $color-text-gray
       .player-middle

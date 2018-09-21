@@ -33,24 +33,24 @@
       </div>
       <div class="player-bottom">
         <div class="progress-wrapper">
-          <span class="time time-l">0:00</span>
+          <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar></progress-bar>
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
             </div>
-          <span class="time time-r">3:20</span>
+          <span class="time time-r">{{format(this.duration)}}</span>
         </div>
         <div class="operate">
           <div class="icon i-left" >
             <i class="iconfont icon-suiji" ></i>
           </div>
           <div class="icon i-left" >
-            <i class="iconfont icon-backward"></i>
+            <i @click="prevSong" class="iconfont icon-backward"></i>
           </div>
           <div class="icon i-center" >
             <i @click="handlePlay" class="iconfont" :class="playIcon"></i>
           </div>
           <div class="icon i-right" >
-            <i class="iconfont icon-forward"></i>
+            <i @click="nextSong"class="iconfont icon-forward"></i>
           </div>
           <div class="icon i-right">
             <i class="iconfont icon-iconfontxihuan"></i>
@@ -71,8 +71,7 @@
         <i class="iconfont icon-play2"></i>
       </div>
     </div>
-    <audio id="music-audio" :src="Song.url" ref="audio" autoplay>
-    </audio>
+    <audio id="music-audio" ref="audio" @canplay="ready" @error="error" @timeupdate="updataTime" autoplay></audio>
   </div>
 </template>
 
@@ -85,6 +84,10 @@
     data(){
       return{
         Song:{},
+        musicUrl:'',
+        songReady: false,
+        currentTime:0,
+        duration: 0
       }
     },
     computed:{
@@ -97,12 +100,13 @@
         'currentSong'
       ]),
 
+      percent(){
+        return this.currentTime/this.duration
+      },
+
       playIcon(){
         return this.isPlaying ? 'icon-pause' : 'icon-play'
       }
-    },
-    created(){
-
     },
     watch:{
       currentSong (newVal, oldVal) {
@@ -113,18 +117,36 @@
           return
         }
         this.$refs.audio.pause()
+        this.$refs.audio.currentTime = 0
         this._getPlaySong(newVal.id)
+      },
+      musicUrl(url){
+        this.$refs.audio.src = url
+        let stop = setInterval(() => {
+          this.duration = this.$refs.audio.duration
+        }, 150)
+        if (this.duration) {
+          clearInterval(stop)
+        }
+        this.setPlayingState(true)
       },
       isPlaying(Playing){
         const audio = this.$refs.audio
         Playing ?  audio.play() : audio.pause()
-      }
+      },
     },
     methods:{
       ...mapMutations({
         setFullScreen:'SET_FULL_SCREEN',
-        setPlayingState:'SET_PLAYING_STATE'
+        setPlayingState:'SET_PLAYING_STATE',
+        setCurrentIndex:'SET_CURRENT_INDEX'
       }),
+      onProgressBarChange(percent){
+        this.$refs.audio.currentTime = this.duration * percent
+        if(!this.isPlaying){
+          this.handlePlay()
+        }
+      },
       back(){
         this.setFullScreen(false)
       },
@@ -135,14 +157,60 @@
       handlePlay(){
         this.setPlayingState(!this.isPlaying)
       },
-
+      updataTime(e){
+        this.currentTime = e.target.currentTime
+      },
+      format(interval){
+        interval = interval | 0
+        let minute = interval / 60 | 0
+        let second = interval % 60
+        if (second < 10) {
+          second = '0' + second
+        }
+        return minute + ':' + second
+      },
       _getPlaySong(id){
         getPlaySong(id).then((res) => {
           if(res.code === ERR_OK){
-            this.Song = res.data[0]
+            this.musicUrl = res.data[0].url
           }
         })
+      },
+      ready (){
+        this.songReady = true
+      },
+      error(){
+        this.songReady = true
+      },
+      nextSong(){
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex + 1
+        if(index === this.playList.length){
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if(!this.isPlaying){
+          this.handlePlay()
+        }
+        this.songReady = false
+      },
+      prevSong(){
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex - 1
+        if(index === -1){
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
+        if(!this.isPlaying){
+          this.handlePlay()
+        }
+        this.songReady = false
       }
+
     },
     components:{
       ProgressBar
@@ -170,7 +238,7 @@
         width 300%
         height 300%
         z-index -1
-        opacity 0.6
+        opacity 0.8
         filter blur(30px)
         .filter
           position absolute

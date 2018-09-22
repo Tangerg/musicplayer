@@ -2,6 +2,8 @@ export const musicList = state => state.musicList
 
 export const playList = state => state.playList
 
+export const playMode = state => state.playMode
+
 export const isPlaying = state => state.isPlaying
 
 export const fullScreen = state => state.fullScreen

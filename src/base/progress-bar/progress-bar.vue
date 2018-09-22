@@ -80,7 +80,6 @@
     watch: {
       percent (newPercent) {
         if (newPercent >= 0 && !this.touch.initiated) {
-          console.log(newPercent);
           const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
           const offsetWidth = newPercent * barWidth
           this._offset(offsetWidth)

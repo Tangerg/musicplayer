@@ -8,7 +8,7 @@
           <h1 class="title">{{headerTitle}}</h1>
         </div>
       </div>
-      <scroll class="list" :data="playList">
+      <scroll class="list" ref="list" :data="playList">
         <div class="music-list-wrapper">
           <div class="bg-image" :style="bgImg">
             <div class="filter"></div>
@@ -21,7 +21,7 @@
             </div>
           </div>
           <div class="song-list-wrapper">
-            <song-list :songs="playList" @select="selectItem" @selectAll="playAll"></song-list>
+            <song-list :songs="ListDetail" @select="selectItem" @selectAll="playAll"></song-list>
           </div>
       </div>
     </scroll>
@@ -36,10 +36,12 @@
   import Scroll from '../../base/scroll/scroll'
 
   import SongList from '../../base/song-list/song-list'
+  import {playlistMixin} from '../../common/js/mixin'
     export default {
+      mixins:[playlistMixin],
       data() {
         return {
-          playList:[],
+          ListDetail:[],
           headerTitle: '歌单'
         }
       },
@@ -81,6 +83,11 @@
         ...mapActions([
           'selectPlay'
         ]),
+        handlePlaylist (playlist) {
+          const bottom = playlist.length > 0 ? '8%' : ''
+          this.$refs.list.$el.style.bottom = bottom
+          this.$refs.list.refresh()
+        },
         _initMusiclist( id){
           if (!id) {
             this.$router.push('/home/recommend')
@@ -88,7 +95,7 @@
           }
           getPlayList(id).then((res) => {
             if(res.code === ERR_OK){
-              this.playList = res.playlist.tracks.map((music)=>{
+              this.ListDetail = res.playlist.tracks.map((music)=>{
                 return creatSongList(music)
               })
             }
@@ -99,13 +106,13 @@
         },
         selectItem(item,index){
           this.selectPlay({
-            list: this.playList,
+            list: this.ListDetail,
             index: index
           })
         },
         playAll(){
           this.selectPlay({
-            list: this.playList,
+            list: this.ListDetail,
           })
         }
 

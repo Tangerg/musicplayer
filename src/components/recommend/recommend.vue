@@ -60,7 +60,6 @@
   import Slider from '../../base/slider/slider'
   import {getBanner,getRecommendList,getRecommendSong} from '../../api/recommend'
   import {ERR_OK} from "../../common/js/config"
-
   export default {
     data(){
       return{

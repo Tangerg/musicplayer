@@ -14,34 +14,34 @@
           <h2 class="subtitle">{{currentSong.singer}}</h2>
         </div>
       </div>
-      <div class="player-middle">
-        <div class="middle-front">
+      <div class="player-middle" @click="changeMiddle">
+        <div class="middle-front" v-show="currentShow === 'cd'">
           <div class="cd-wrapper">
             <div class="cd">
-              <img class="image" :src="currentSong.image" alt="">
+              <img class="image" :src="currentSong.image" >
             </div>
           </div>
         </div>
-        <div class="middle-behind">
+        <scroll class="middle-behind" ref="lyricList" :data="currentLyric && currentLyric.lines" v-show="currentShow === 'lyric'">
           <div class="lyric-wrapper">
-            <div class="currentLyric">
-              <p class="text"></p>
+            <div class="currentLyric" v-if="currentLyric">
+              <p ref="lyricLine" class="text" :class="{'highLight':currentLineNum === index}"  v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
               <p class="no-lyric"></p>
             </div>
           </div>
-        </div>
+        </scroll>
       </div>
       <div class="player-bottom">
         <div class="progress-wrapper">
           <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange" @percentChangeEnd="onPercentChangeEnd"></progress-bar>
             </div>
           <span class="time time-r">{{format(this.duration)}}</span>
         </div>
         <div class="operate">
           <div class="icon i-left" >
-            <i class="iconfont icon-suiji" ></i>
+            <i class="iconfont" :class="iconMode" @click="changeMode"></i>
           </div>
           <div class="icon i-left" >
             <i @click="prevSong" class="iconfont icon-backward"></i>
@@ -68,27 +68,42 @@
       </div>
       <div class="control"></div>
       <div class="control">
-        <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
+        <progress-circle :radius="radius" :percent="percent">
+          <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
+        </progress-circle>
       </div>
     </div>
-    <audio id="music-audio" ref="audio" @canplay="ready" @error="error" @timeupdate="updataTime" autoplay></audio>
+    <audio id="music-audio" ref="audio" @canplay="ready" @error="error" @timeupdate="updataTime" @ended="end" autoplay></audio>
   </div>
 </template>
 
 <script>
   import {mapGetters, mapMutations, mapActions} from 'vuex'
   import ProgressBar from '../../base/progress-bar/progress-bar'
+  import ProgressCircle from '../../base/progress-circle/progress-circle'
   import {ERR_OK} from '../../common/js/config'
-  import {getPlaySong} from '../../api/play-list'
+  import {getPlaySong,getSongLyric} from '../../api/song'
+  import {Mode} from '../../common/js/config'
+  import {shuffle} from '../../common/js/util'
+  import Lyric from 'lyric-parser'
+  import Scroll from '../../base/scroll/scroll'
+
   export default {
     data(){
       return{
         Song:{},
         musicUrl:'',
+        currentLyric:null,
+        currentLineNum:0,
         songReady: false,
         currentTime:0,
-        duration: 0
+        duration: 0,
+        radius:30,
+        currentShow:'cd'
       }
+    },
+    created() {
+      this.touch = {}
     },
     computed:{
       ...mapGetters([
@@ -97,18 +112,27 @@
         'sequenceList',
         'isPlaying',
         'currentIndex',
-        'currentSong'
+        'currentSong',
+        'playMode'
       ]),
 
       percent(){
         return this.currentTime/this.duration
       },
-
+      iconMode(){
+        if (this.playMode === Mode.sequence) {
+          return 'icon-liebiaoxunhuan'
+        } else if (this.playMode === Mode.loop) {
+          return 'icon-danquxunhuan'
+        } else {
+          return 'icon-suiji'
+        }
+      },
       playIcon(){
         return this.isPlaying ? 'icon-pause' : 'icon-play'
       },
       miniPlayIcon(){
-        return this.isPlaying ? 'icon-pause1' : 'icon-play2'
+        return this.isPlaying ? 'icon-pause2' : 'icon-play2'
       }
     },
     watch:{
@@ -122,6 +146,10 @@
         this.$refs.audio.pause()
         this.$refs.audio.currentTime = 0
         this._getPlaySong(newVal.id)
+        if(this.currentLyric){
+          this.currentLyric.stop()
+        }
+        this._getSongLyric(newVal.id)
       },
       musicUrl(url){
         this.$refs.audio.src = url
@@ -142,9 +170,39 @@
       ...mapMutations({
         setFullScreen:'SET_FULL_SCREEN',
         setPlayingState:'SET_PLAYING_STATE',
-        setCurrentIndex:'SET_CURRENT_INDEX'
+        setCurrentIndex:'SET_CURRENT_INDEX',
+        setPlayingMode:'SET_PLAYING_MODE',
+        setPlayList:'SET_PLAY_LIST'
       }),
+      changeMode(){
+        const playMode = (this.playMode+1) % 3
+        this.setPlayingMode(playMode)
+        let list = null
+        if(playMode === Mode.random){
+          list = shuffle(this.sequenceList)
+        }else{
+          list = this.sequenceList
+        }
+        this.resetCurrentIndex(list)
+        this.setPlayList(list)
+      },
+      resetCurrentIndex(list){
+        let index = list.findIndex((item)=>{
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index)
+      },
       onProgressBarChange(percent){
+        const currentTime = this.duration * percent
+        this.$refs.audio.currentTime = this.duration * percent
+        if(!this.isPlaying){
+          this.handlePlay()
+        }
+        if(this.currentLyric){
+          this.currentLyric.seek(currentTime * 1000)
+        }
+      },
+      onPercentChangeEnd(percent){
         this.$refs.audio.currentTime = this.duration * percent
         if(!this.isPlaying){
           this.handlePlay()
@@ -158,10 +216,30 @@
       },
 
       handlePlay(){
+        if(!this.songReady){
+          return
+        }
         this.setPlayingState(!this.isPlaying)
+        if(this.currentLyric){
+          this.currentLyric.togglePlay()
+        }
       },
       updataTime(e){
         this.currentTime = e.target.currentTime
+      },
+      end(){
+        if(this.playMode === Mode.loop){
+          this.loop()
+        }else{
+          this.nextSong()
+        }
+      },
+      loop(){
+        this.$refs.audio.currentTime =
+        this.$refs.audio.play()
+        if(this.currentLyric){
+          this.currentLyric.seek(0)
+        }
       },
       format(interval){
         interval = interval | 0
@@ -179,6 +257,26 @@
           }
         })
       },
+      _getSongLyric(id){
+        getSongLyric(id).then((res) => {
+          if(res.code === ERR_OK){
+            this.currentLyric = new Lyric(res.lrc.lyric,this.handleLyric)
+            if(this.isPlaying){
+              this.currentLyric.play()
+            }
+          }
+        })
+      },
+      handleLyric({lineNum,txt}){
+        this.currentLineNum = lineNum
+        if(lineNum>4){
+          let lineEl = this.$refs.lyricLine[lineNum - 4]
+          this.$refs.lyricList.scrollToElement(lineEl, 1000)
+        }else {
+          this.$refs.lyricList.scrollTo(0, 0, 1000)
+        }
+      },
+
       ready (){
         this.songReady = true
       },
@@ -212,11 +310,21 @@
           this.handlePlay()
         }
         this.songReady = false
-      }
+      },
+
+      changeMiddle () {
+        if (this.currentShow === 'cd') {
+          this.currentShow = 'lyric'
+        } else {
+          this.currentShow = 'cd'
+        }
+      },
 
     },
     components:{
-      ProgressBar
+      ProgressBar,
+      ProgressCircle,
+      Scroll
     }
 
   }
@@ -342,10 +450,10 @@
             text-align center
             .text
               line-height 40px
-              color $color-text-ggg
+              color $color-text-white-ll
               font-size $font-size-medium
-              &.current
-                color #FFF
+              &.highLight
+                color $color-text-white
             .no-lyric
               line-height 40px
               margin-top 60%
@@ -387,7 +495,12 @@
               font-size 30px
             .icon-suiji
               font-size 25px
+            .icon-danquxunhuan, .icon-liebiaoxunhuan
+              font-size 30px
             .icon-iconfontxihuan
+              font-size 25px
+            .icon-iconfontxihuan2
+              color red
               font-size 25px
             &.i-left
               text-align right
@@ -440,4 +553,11 @@
         flex: 0 0 30px
         width: 30px
         padding: 0 10px
+        .icon-play2, .icon-pause2
+          font-size: 30px
+          color: $color-background-d
+        .iconfont
+          position: absolute
+          left: 0
+          top: 0
 </style>

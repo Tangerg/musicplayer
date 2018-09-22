@@ -106,14 +106,15 @@
         height 100%
         background $color-theme
       .progress-btn-wrapper
-        position absolute
-        left -5px
-        top -6px
-        width 15px
-        height 15px
+        position: absolute
+        left: -8px
+        top: -13px
+        width: 30px
+        height: 30px
         .progress-btn
-          position relative
-          left 0
+          position: relative
+          top: 7px
+          left: 7px
           box-sizing border-box
           width 15px
           height 15px

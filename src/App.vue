@@ -12,6 +12,30 @@
   import Mheader from './components/m-header/m-header'
   import Mplayer from './components/m-player/m-player'
 export default {
+  data () {
+    return {
+      stop: false
+    }
+  },
+  mounted () {
+    let m = document.querySelector('#app')
+    m.addEventListener('touchend', this.firstPlay)
+  },
+  methods: {
+    firstPlay () {
+      let music = document.querySelector('#music-audio')
+      music.play()
+      if (music.src !== '') {
+        this.stop = true
+      }
+    }
+  },
+  watch: {
+    stop () {
+      let m = document.querySelector('#app')
+      m.removeEventListener('touchend', this.firstPlay)
+    }
+  },
   components:{
     Mplayer,
     Mheader

@@ -3,7 +3,7 @@ import {HOST} from '../common/js/config'
 
 
 //获取音乐列表
-export const getPlayList= (id) => ajax(`${prod.env.API_URL}+/playlist/detail?id=${id}`)
+export const getPlayList= (id) => ajax(HOST+`/playlist/detail?id=${id}`)
 
 //获得单曲
-export const getPlaySong= (id) => ajax(`${prod.env.API_URL}/music/url?id=${id}`)
+export const getPlaySong= (id) => ajax(HOST+`/music/url?id=${id}`)

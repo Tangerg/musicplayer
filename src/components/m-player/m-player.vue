@@ -68,7 +68,7 @@
       </div>
       <div class="control"></div>
       <div class="control">
-        <i class="iconfont icon-play2"></i>
+        <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
       </div>
     </div>
     <audio id="music-audio" ref="audio" @canplay="ready" @error="error" @timeupdate="updataTime" autoplay></audio>
@@ -106,6 +106,9 @@
 
       playIcon(){
         return this.isPlaying ? 'icon-pause' : 'icon-play'
+      },
+      miniPlayIcon(){
+        return this.isPlaying ? 'icon-pause1' : 'icon-play2'
       }
     },
     watch:{
@@ -437,12 +440,4 @@
         flex: 0 0 30px
         width: 30px
         padding: 0 10px
-        .icon-play-mini, .icon-pause-mini, .icon-playlist
-          font-size: 30px
-          color: $color-theme-d
-        .icon-mini
-          font-size: 32px
-          position: absolute
-          left: 0
-          top: 0
 </style>

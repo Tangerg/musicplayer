@@ -1,3 +1,7 @@
+export const SET_SINGER_CATEGORY = 'SET_SINGER_CATEGORY'
+
+export const SET_SINGER_INFO = 'SET_SINGER_INFO'
+
 export const SET_MUSIC_LIST = 'SET_MUSIC_LIST'
 
 export const SET_PLAY_LIST = 'SET_PLAY_LIST'

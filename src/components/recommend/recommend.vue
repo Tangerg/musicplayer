@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <scroll ref="scroll" class="recommend-content" :data="recommendlist&&recommendsong">
       <div>
         <div class="background-red"></div>
@@ -19,7 +19,7 @@
             <li v-for="songList in recommendlist" :key="songList.id" class="item" @click="_chickList(songList)">
               <div class="icon">
                 <div class="gradients"></div>
-                <img :src="songList.picUrl" alt="">
+                <img @load="loadImage" :src="songList.picUrl" alt="">
               </div>
               <p class="play-count">
                 <i class="iconfont icon-customer"></i>
@@ -39,7 +39,7 @@
           <ul  class="items">
             <li v-for="song in recommendsong" :key="song.id" class="item" >
               <div class="icon">
-                <img :src="song.song.album.picUrl" alt="">
+                <img @load="loadImage" :src="song.song.album.picUrl" alt="">
               </div>
               <div class="song-singer">
                 <span class="song">{{song.name}}</span>
@@ -60,7 +60,9 @@
   import Slider from '../../base/slider/slider'
   import {getBanner,getRecommendList,getRecommendSong} from '../../api/recommend'
   import {ERR_OK} from "../../common/js/config"
+  import {playlistMixin} from '../../common/js/mixin'
   export default {
+    mixins:[playlistMixin],
     data(){
       return{
         banners:[],
@@ -77,6 +79,11 @@
       ...mapMutations({
         setMuiscList: 'SET_MUSIC_LIST',
       }),
+      handlePlaylist (playlist) {
+        const bottom = playlist.length > 0 ? '8%' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
       loadImage() {
         if (!this.checkloaded) {
           this.checkloaded = true
@@ -107,10 +114,11 @@
 
 
       _chickList(songList){
+        this.setMuiscList(songList)
         this.$router.push({
           path: `/home/recommend/${songList.id}`
         })
-        this.setMuiscList(songList)
+
       }
     },
     components:{

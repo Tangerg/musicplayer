@@ -1,5 +1,7 @@
 import {Mode} from '../common/js/config'
 const state = {
+  singerCategory: 0,
+  singerInfo:{},
   musicList: {},
   playList:[],
   sequenceList:[],

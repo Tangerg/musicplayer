@@ -8,7 +8,7 @@
           <h1 class="title">{{headerTitle}}</h1>
         </div>
       </div>
-      <scroll class="list" ref="list" :data="playList">
+      <scroll class="list" ref="list" :data="ListDetail">
         <div class="music-list-wrapper">
           <div class="bg-image" :style="bgImg">
             <div class="filter"></div>
@@ -34,7 +34,6 @@
   import {getPlayList} from '../../api/play-list'
   import {creatSongList} from "../../common/classes/song";
   import Scroll from '../../base/scroll/scroll'
-
   import SongList from '../../base/song-list/song-list'
   import {playlistMixin} from '../../common/js/mixin'
     export default {
@@ -115,10 +114,7 @@
             list: this.ListDetail,
           })
         }
-
       },
-
-
     }
 </script>
 
@@ -138,7 +134,7 @@
       display flex
       align-items center
       box-sizing border-box
-      height 45px
+      height 8%
       z-index 100
       .back
         flex 0 0 50px;

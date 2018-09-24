@@ -93,7 +93,7 @@
       selectSinger(item,index){
         this.setSingerInfo(item)
         this.$router.push({
-          path: '/home/singerdetail'
+          path: `/home/singer/${item.id}`
         })
       }
     },

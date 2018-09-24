@@ -84,10 +84,10 @@
           this.$refs.scroll.refresh()
         },
         clickCategory(category){
-          this.$router.push({
-            path: `/home/singer/${category}`
-          })
           this.setSingerCategory(category)
+          this.$router.push({
+            path: '/home/singer/list'
+          })
         }
       },
       components:{

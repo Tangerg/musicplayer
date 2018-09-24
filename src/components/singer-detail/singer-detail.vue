@@ -40,8 +40,8 @@
         headerTitle: '歌单',
       }
     },
-    created(){
-      this._initSingerDetail()
+    created() {
+      this._initSingerDetail(this.singerInfo.id)
     },
     computed:{
       ...mapGetters([
@@ -70,9 +70,14 @@
         this.$refs.list.$el.style.bottom = bottom
         this.$refs.list.refresh()
       },
-      _initSingerDetail(){
-        getSongBySinger(this.singerInfo.id).then((res) => {
+      _initSingerDetail(id){
+        if (!id){
+          this.$router.push('/home/singer')
+          return
+        }
+        getSongBySinger(id).then((res) => {
           if(res.code === ERR_OK){
+            this.songList = []
             this.songList = res.hotSongs.map((music)=>{
               return creatSongList(music)
             })

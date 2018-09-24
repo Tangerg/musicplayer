@@ -47,14 +47,14 @@ export default new Router({
           component:Singer,
           children:[
             {
-              path:':category',
+              path:'/home/singer/list',
               component:SingerList,
             },
+            {
+              path:':id',
+              component:SingerDetail,
+            },
           ]
-        },
-        {
-          path:'/home/singerdetail',
-          component:SingerDetail,
         },
         {
           path:'/home/rank',

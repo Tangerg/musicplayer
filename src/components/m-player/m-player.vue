@@ -203,9 +203,13 @@
         }
       },
       onPercentChangeEnd(percent){
+        const currentTime = this.duration * percent
         this.$refs.audio.currentTime = this.duration * percent
         if(!this.isPlaying){
           this.handlePlay()
+        }
+        if(this.currentLyric){
+          this.currentLyric.seek(currentTime * 1000)
         }
       },
       back(){

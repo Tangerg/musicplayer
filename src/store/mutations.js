@@ -13,6 +13,9 @@ const mutations = {
   [types.SET_PLAY_LIST] (state, playList) {
     state.playList = playList
   },
+  [types.SET_RANK_LIST] (state, rankList) {
+    state.rankList = rankList
+  },
   [types.SET_SEQUENCE_LIST] (state, playList) {
     state.sequenceList = playList
   },

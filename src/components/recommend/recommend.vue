@@ -111,8 +111,6 @@
           }
         })
       },
-
-
       _chickList(songList){
         this.setMuiscList(songList)
         this.$router.push({

@@ -45,12 +45,11 @@
         }
       },
       created(){
-        this._initMusiclist(this.musicList.id)
+        this._initMusicList(this.musicList.id)
       },
       computed:{
         ...mapGetters([
           'musicList',
-          'sequencePlay'
         ]),
         playCount(){
           if (!this.musicList.playCount) {
@@ -87,7 +86,7 @@
           this.$refs.list.$el.style.bottom = bottom
           this.$refs.list.refresh()
         },
-        _initMusiclist( id){
+        _initMusicList( id){
           if (!id) {
             this.$router.push('/home/recommend')
             return

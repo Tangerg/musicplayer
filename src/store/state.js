@@ -4,6 +4,7 @@ const state = {
   singerInfo:{},
   musicList: {},
   playList:[],
+  rankList:{},
   sequenceList:[],
   isPlaying: true,
   fullScreen:false,

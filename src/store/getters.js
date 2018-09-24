@@ -6,6 +6,8 @@ export const musicList = state => state.musicList
 
 export const playList = state => state.playList
 
+export const rankList = state => state.rankList
+
 export const playMode = state => state.playMode
 
 export const isPlaying = state => state.isPlaying

@@ -237,5 +237,6 @@
                 overflow hidden
                 white-space nowrap
                 font-size $font-size-small-s
-                color 10px
+                color $color-text-black
+                padding-bottom 5px
 </style>

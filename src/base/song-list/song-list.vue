@@ -60,10 +60,10 @@
       display flex
       align-items center
       box-sizing border-box
-      height 40px
+      height 50px
       border-bottom 1px solid $color-line-gray
       .iconfont
-        flex 0 0 50px;
+        flex 0 0 55px;
         text-align center
         color $color-text-black
       .text
@@ -77,21 +77,21 @@
       display flex
       align-items center
       box-sizing border-box
-      height 50px
+      height 60px
       border-bottom 1px solid $color-line-gray
       .rank
-        flex 0 0 50px;
+        flex 0 0 55px;
         text-align center
         color $color-text-black
       .content
         flex 1
-        height 50px
+        height 60px
         overflow hidden
         .name
           no-wrap()
           width: 90%;
-          height 30px
-          line-height 30px
+          height 40px
+          line-height 40px
           font-size $font-size-medium
           color $color-text-black
         .desc

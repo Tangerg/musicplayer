@@ -14,7 +14,7 @@
         <i class="iconfont icon-fingerprint"></i>s
       </span>
     </div>
-    <div class="header-right">
+    <div class="header-right" @click="goToPush('/search')">
       <i class="iconfont icon-chaxun"></i>
     </div>
   </div>
@@ -25,6 +25,9 @@
     methods: {
       goTo (path) {
         this.$router.replace(path)
+      },
+      goToPush (path) {
+        this.$router.push(path)
       }
     }
   }

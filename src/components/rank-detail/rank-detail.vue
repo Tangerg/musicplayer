@@ -129,7 +129,7 @@
       height 8%
       z-index 100
       .back
-        flex 0 0 50px;
+        flex 0 0 55px;
         text-align center
         color $color-text-white
         .icon-left

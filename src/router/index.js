@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import MV from '../components/mv/mv'
 import Music from '../components/music/music'
+import Search from '../components/search/search'
 import Home from '../components/home/home'
 import Recommend from '../components/recommend/recommend'
 import Singer from '../components/singer/singer'
@@ -66,6 +67,10 @@ export default new Router({
           }]
         }
       ]
+    },
+    {
+      path :'/search',
+      component:Search
     }
   ]
 })

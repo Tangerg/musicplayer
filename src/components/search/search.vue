@@ -5,30 +5,21 @@
         <i class="iconfont icon-left"></i>
       </div>
       <div class="input-searchBox">
-        <search-box ref="searchBox"></search-box>
+        <search-box ref="searchBox" @query="onQueryChange"></search-box>
       </div>
     </div>
     <scroll class="search-scroll-wrapper" ref="scroll">
       <div ref="search">
-        <div class="search-hots">
+        <div class="search-hots" v-show="!query">
           <p class="title">热门搜索</p>
-          <span class="search-hots-item">
-            周杰伦
-          </span>
-          <span class="search-hots-item">
-            王力宏
-          </span>
-          <span class="search-hots-item">
-            烟花易冷
-          </span>
-          <span class="search-hots-item">
-            飘向北方
-          </span>
-          <span class="search-hots-item">
-            应用化学
+          <span class="search-hots-item"
+                v-for="(hotkey,index) in HotKey"
+                :key="index"
+                @click="addQuery(hotkey.first)">
+            {{hotkey.first}}
           </span>
         </div>
-        <div class="shortcut-wrapper">
+        <div class="shortcut-wrapper" v-show="!query">
           <div class="search-history">
             <h1 class="title">
               <span class="text">搜索历史</span>
@@ -36,11 +27,11 @@
                   <i class="iconfont icon-lajitong"></i>
                 </span>
             </h1>
-            <search-list></search-list>
+            <!--<search-list></search-list>-->
           </div>
         </div>
-        <div class="search-result">
-          <suggest></suggest>
+        <div class="search-result" v-show="query">
+          <suggest :keyWorlds="query"></suggest>
         </div>
       </div>
     </scroll>
@@ -49,18 +40,45 @@
 
 <script>
   import Scroll from '../../base/scroll/scroll'
+  import Suggest from '../suggest/suggest'
   import SearchBox from '../../base/search-box/search-box'
   import SearchList from '../../base/search-list/search-list'
+  import {ERR_OK} from "../../common/js/config";
+  import {getHotKey} from '../../api/search'
     export default {
+
+      data(){
+        return{
+          HotKey:[],
+          query:''
+        }
+      },
+      created(){
+        this._getHotKey()
+      },
       methods:{
         _back(){
           this.$router.back()
+        },
+        _getHotKey(){
+          getHotKey().then((res)=>{
+            if(res.code === ERR_OK){
+              this.HotKey = res.result.hots
+            }
+          })
+        },
+        addQuery(query){
+          this.$refs.searchBox.setQuery(query)
+        },
+        onQueryChange (query) {
+          this.query = query
         },
       },
      components:{
        SearchBox,
        SearchList,
-       Scroll
+       Scroll,
+       Suggest
      }
     }
 </script>
@@ -80,7 +98,7 @@
       display flex
       align-items center
       box-sizing border-box
-      height 8%
+      height 50px
       background-color $color-background-red
       .back
         flex 0 0 55px;
@@ -106,8 +124,8 @@
           color $color-text-gray-d
         .search-hots-item
           display inline-block
-          padding 3px 5px
-          margin 4px 4px 4px 0px
+          padding 5px 10px
+          margin 4px 4px 4px 0
           border 1px solid $color-line-gray-d
           border-radius 100px
           line-height 20px
@@ -130,7 +148,7 @@
             .clear
               include extend-click()
               .icon-lajitong
-                font-size $font-size-large
+                font-size $font-size-medium-x
                 color $color-text-gray-d
       .search-result
         position relative

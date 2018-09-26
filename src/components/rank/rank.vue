@@ -78,7 +78,7 @@
   @import "../../common/stylus/mixin"
   .rank-container
     position fixed
-    top 85px
+    top 95px
     width 100%
     bottom 0
     z-index 100

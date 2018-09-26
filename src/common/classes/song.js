@@ -29,9 +29,8 @@ export function creatSongList(music) {
 export function creatSong(music) {
   return new Song({
     id:music.id,
-    singer:singerName(music.ar),
+    singer:singerName(music.artists),
     name:music.name,
-    album:music.al.name,
-    image:music.al.picUrl
+    album:music.album.name,
   })
 }

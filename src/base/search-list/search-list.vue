@@ -64,6 +64,6 @@
       .icon
         include extend-click()
         .icon-close
-          font-size $font-size-large
+          font-size $font-size-medium-x
           color $color-text-gray-d
 </style>

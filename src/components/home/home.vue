@@ -27,7 +27,7 @@
   .tab
     background-color $color-background-red
     display: flex
-    height: 40px
+    height: 45px
     line-height: 40px
     font-size: $font-size-medium
     z-index 100

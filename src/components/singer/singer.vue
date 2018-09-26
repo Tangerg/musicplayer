@@ -101,7 +101,7 @@
   @import "../../common/stylus/mixin"
   .singer-container
     position fixed
-    top 85px
+    top 95px
     width 100%
     max-height 100%
     bottom 0

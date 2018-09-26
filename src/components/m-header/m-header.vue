@@ -40,7 +40,7 @@
   .m-header
     background-color $color-background-red
     position: relative
-    height: 45px
+    height: 50px
     text-align: center
     color: $color-text-white
     font-size: 0

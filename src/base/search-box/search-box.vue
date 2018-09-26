@@ -18,7 +18,6 @@
     data () {
       return {
         query: '',
-        clickInfo: '搜索'
       }
     },
     created () {

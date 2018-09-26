@@ -86,7 +86,7 @@
           this.$refs.list.$el.style.bottom = bottom
           this.$refs.list.refresh()
         },
-        _initMusicList( id){
+        _initMusicList(id){
           if (!id) {
             this.$router.push('/home/recommend')
             return

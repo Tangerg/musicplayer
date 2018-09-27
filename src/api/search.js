@@ -11,7 +11,7 @@ export const getSearchSuggest = (keywords) => ajax(HOST+`/search?keywords=${keyw
 export const getSearchSinger = (keywords) => ajax(HOST+`/search?keywords=${keywords}&type=100`)
 
 //搜索歌单
-export const getSearchList = (keywords) => ajax(HOST+`/search?keywords=${keywords}&type=102`)
+export const getSearchList = (keywords) => ajax(HOST+`/search?keywords=${keywords}&type=1000`)
 
 //分页
 export const getSearchSongs = (keywords, page) => ajax(HOST+`/search?keywords=${keywords}&offset=${page}`)

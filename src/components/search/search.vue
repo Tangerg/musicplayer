@@ -8,7 +8,7 @@
         <search-box ref="searchBox" @query="onQueryChange"></search-box>
       </div>
     </div>
-    <scroll class="search-scroll-wrapper" ref="scroll">
+    <scroll class="search-scroll-wrapper" ref="scroll" :pullup="pullup" @scrollToEnd="searchMore">
       <div ref="search">
         <div class="search-hots" v-show="!query">
           <p class="title">热门搜索</p>
@@ -31,10 +31,11 @@
           </div>
         </div>
         <div class="search-result" v-show="query">
-          <suggest :keyWorlds="query"></suggest>
+          <suggest :keyWorlds="query" ref="suggest"></suggest>
         </div>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -46,9 +47,9 @@
   import {ERR_OK} from "../../common/js/config";
   import {getHotKey} from '../../api/search'
     export default {
-
       data(){
         return{
+          pullup:true,
           HotKey:[],
           query:''
         }
@@ -57,8 +58,12 @@
         this._getHotKey()
       },
       methods:{
+        searchMore(){
+          this.$refs.suggest.searchMore()
+        },
         _back(){
           this.$router.back()
+          this.$refs.searchBox.clear()
         },
         _getHotKey(){
           getHotKey().then((res)=>{

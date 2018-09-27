@@ -3,7 +3,7 @@
       <ul>
         <li class="item-list" v-for="(singer,index) in singers" @click.stop="selectItem(singer, index)">
           <div class="avatar">
-            <img width="95%" height="95%" :src="singer.avatar" />
+            <img width="95%" height="95%" v-lazy="singer.avatar" />
           </div>
           <div class="content">
             <h2 class="name">{{singer.name}}</h2>

@@ -2,20 +2,20 @@
   <div class="suggest">
     <div class="search-suggest" >
       <p class="title">你可能感兴趣</p>
-      <div class="search-suggest-item">
-        <img src="http://p1.music.126.net/cnGpIQ6rQCKVrDyVVSpzeg==/3263350518850877.jpg" width="50" height="50">
-        <span>歌手：林俊杰</span>
+      <div class="search-suggest-item" v-show="this.singer" @click="selectSinger">
+        <img :src="this.singer.avatar" width="50" height="50">
+        <span>歌手：{{this.singer.name}}</span>
       </div>
-      <div class="search-suggest-item">
-        <img src="http://p1.music.126.net/wF9f--4Xa5Gm9nXamlWwEw==/109951163089450173.jpg" width="50" height="50">
+      <div class="search-suggest-item" v-show="this.songList" @click="selectList">
+        <img :src="this.songList.picUrl" width="50" height="50">
         <div class="text">
-          <p>歌单：林俊杰全部歌曲</p>
-          <p class="singer">林俊杰</p>
+          <p>歌单：{{this.songList.name}}</p>
+          <p class="singer">{{this.songList.trackCount}}首&nbsp;by&nbsp;{{this.songList.creator}}</p>
         </div>
       </div>
     </div>
-    <ul class="suggest-list" ref="suggestList" >
-      <li class="suggest-item" v-for="(song,index) in songs" :key="index">
+    <ul class="suggest-list" ref="suggestList">
+      <li class="suggest-item" v-for="(song,index) in songs" :key="index" @click="selectSong">
         <div class="icon">
           <i class="iconfont icon-yinle"></i>
         </div>
@@ -29,11 +29,12 @@
 </template>
 
 <script>
-  import {getSearchSongs, getSearchSuggest, getSongDetail,getSearchSinger} from '../../api/search'
+  import {getSearchSongs, getSearchSuggest, getSongDetail,getSearchSinger,getSearchList} from '../../api/search'
   import {ERR_OK} from "../../common/js/config";
   import {creatSong} from "../../common/classes/song";
   import {creatSinger} from "../../common/classes/singer";
-
+  import {createSearchMusicList} from "../../common/classes/musicList";
+  import {mapMutations} from 'vuex'
   export default {
     props: {
       keyWorlds: {
@@ -53,33 +54,72 @@
       return {
         singer: {},
         songs: [],
-        songList:[],
-        suggest: {},
+        isFirst:false,
+        songList:{},
         searchShow: true,
         page: 0,
-        update: true,
-        haveMore: true
+        haveMore: true,
       }
     },
     methods:{
+      ...mapMutations({
+        setSingerInfo:'SET_SINGER_INFO',
+        setMusicList:'SET_MUSIC_LIST'
+      }),
+      selectSinger(){
+        this.setSingerInfo(this.singer)
+        this.$router.push({
+          path: `/home/singer/${this.singer.id}`
+        })
+      },
+      selectList(){
+        this.setMusicList(this.songList)
+        this.$router.push({
+          path: `/home/recommend/${this.songList.id}`
+        })
+      },
+      selectSong(){
+
+      },
+      listScroll() {
+        this.$emit('listScroll')
+      },
       search(keyWorlds){
         this.searchShow = false
         this.haveMore = true
-        getSearchSuggest(keyWorlds).then((res)=>{
-          if(res.code === ERR_OK){
-            this.songs = res.result.songs.map((music)=>{
-              return creatSong(music)
-            })
-          }
-        })
+        this.page = 0
+        this.isFirst = true
+        this.searchSong(keyWorlds,this.page)
+        this.searchSinger(keyWorlds)
+        this.searchList(keyWorlds)
+      },
+      searchMore(){
+        this.searchShow = false
+        this.haveMore = true
+        this.page += 30
+        this.isFirst = false
+        this.searchSong(this.keyWorlds,this.page)
+        console.log(searchMore)
+        this.$emit('refresh')
       },
       searchSong(keyWorlds,page){
         getSearchSongs(keyWorlds,page).then((res)=>{
+          if (!res.result.songs) {
+            this.haveMore = false
+            return
+          }
           if(res.code === ERR_OK){
-            this.songs = res.result.songs.map((music)=>{
-              return creatSong(music)
-            })
-            console.log(this.songs)
+            if(this.isFirst){
+              this.songs = res.result.songs.map((music)=>{
+                return creatSong(music)
+              })
+            }else if(!this.isFirst){
+              let ret = []
+              ret = res.result.songs.map((music)=>{
+                return creatSong(music)
+              })
+              this.songs = this.songs.concat(ret)
+            }
           }
         })
       },
@@ -94,14 +134,15 @@
       searchList(keyWorlds){
         getSearchList(keyWorlds).then((res)=>{
           if(res.code === ERR_OK){
-            this.songList = res.result.songs[0]
+            let musicList = res.result.playlists[0]
+            this.songList = createSearchMusicList(musicList)
           }
         })
       }
     },
     watch: {
       keyWorlds (val) {
-        this.searchSong(val,10)
+        this.search(val)
       }
     },
   }

@@ -45,10 +45,10 @@
     align-items center
     width 95%
     height 90%
-    border-bottom 1px solid rgba(255, 255, 255, 0.6)
+    border-bottom 1.2px solid rgba(255, 255, 255, 0.8)
     .input-box
       width 85%
-      height 90%
+      height 100%
       background $color-background-red
       color $color-background-white
       font-size $font-size-medium-x

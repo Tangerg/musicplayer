@@ -19,7 +19,7 @@
             <li v-for="songList in recommendlist" :key="songList.id" class="item" @click="_chickList(songList)">
               <div class="icon">
                 <div class="gradients"></div>
-                <img @load="loadImage" :src="songList.picUrl" alt="">
+                <img @load="loadImage" v-lazy="songList.picUrl" alt="">
               </div>
               <p class="play-count">
                 <i class="iconfont icon-customer"></i>
@@ -39,7 +39,7 @@
           <ul  class="items">
             <li v-for="song in recommendsong" :key="song.id" class="item" >
               <div class="icon">
-                <img @load="loadImage" :src="song.song.album.picUrl" alt="">
+                <img @load="loadImage" v-lazy="song.song.album.picUrl" alt="">
               </div>
               <div class="song-singer">
                 <span class="song">{{song.name}}</span>
@@ -56,6 +56,7 @@
 
 <script>
   import {mapMutations} from 'vuex'
+  import {createMusicList} from '../../common/classes/musicList'
   import Scroll from '../../base/scroll/scroll'
   import Slider from '../../base/slider/slider'
   import {getBanner,getRecommendList,getRecommendSong} from '../../api/recommend'
@@ -100,7 +101,9 @@
       _initRecommendList(){
         getRecommendList().then((res) => {
           if(res.code === ERR_OK){
-            this.recommendlist = res.result
+            this.recommendlist = res.result.map((musiclist)=>{
+              return createMusicList(musiclist)
+            })
           }
         })
       },

@@ -37,7 +37,7 @@
     data() {
       return {
         songList:[],
-        headerTitle: '歌单',
+        headerTitle: '歌手',
       }
     },
     created() {

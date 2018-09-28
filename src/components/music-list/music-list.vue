@@ -45,7 +45,7 @@
         }
       },
       created(){
-        this._initMusicList(this.musicList.id)
+        this._initMusicList()
       },
       computed:{
         ...mapGetters([
@@ -86,12 +86,12 @@
           this.$refs.list.$el.style.bottom = bottom
           this.$refs.list.refresh()
         },
-        _initMusicList(id){
-          if (!id) {
+        _initMusicList(){
+          if (!this.musicList.id) {
             this.$router.push('/home/recommend')
             return
           }
-          getPlayList(id).then((res) => {
+          getPlayList(this.musicList.id).then((res) => {
             if(res.code === ERR_OK){
               this.ListDetail = res.playlist.tracks.map((music)=>{
                 return creatSongList(music)

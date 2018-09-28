@@ -1,20 +1,20 @@
 <template>
   <div class="suggest">
-    <div class="search-suggest" >
+    <div class="search-suggest" v-show="!searchShow && keyWorlds && songs.length > 0">
       <p class="title">你可能感兴趣</p>
-      <div class="search-suggest-item" v-show="this.singer" @click="selectSinger">
-        <img :src="this.singer.avatar" width="50" height="50">
-        <span>歌手：{{this.singer.name}}</span>
+      <div class="search-suggest-item" v-show="!searchShow&&singer" @click="selectSinger(singer)">
+        <img :src="singer.avatar" width="50" height="50">
+        <span>歌手：{{singer.name}}</span>
       </div>
-      <div class="search-suggest-item" v-show="this.songList" @click="selectList">
-        <img :src="this.songList.picUrl" width="50" height="50">
+      <div class="search-suggest-item" v-show="!searchShow&&songList" @click="selectList(songList)">
+        <img :src="songList.picUrl" width="50" height="50">
         <div class="text">
-          <p>歌单：{{this.songList.name}}</p>
-          <p class="singer">{{this.songList.trackCount}}首&nbsp;by&nbsp;{{this.songList.creator}}</p>
+          <p>歌单：{{songList.name}}</p>
+          <p class="singer">{{songList.trackCount}}首&nbsp;by&nbsp;{{songList.creator}}</p>
         </div>
       </div>
     </div>
-    <ul class="suggest-list" ref="suggestList">
+    <ul class="suggest-list" ref="suggestList" v-show="!searchShow">
       <li class="suggest-item" v-for="(song,index) in songs" :key="index" @click="selectSong">
         <div class="icon">
           <i class="iconfont icon-yinle"></i>
@@ -66,23 +66,20 @@
         setSingerInfo:'SET_SINGER_INFO',
         setMusicList:'SET_MUSIC_LIST'
       }),
-      selectSinger(){
-        this.setSingerInfo(this.singer)
+      selectSinger(singer){
+        this.setSingerInfo(singer)
         this.$router.push({
-          path: `/home/singer/${this.singer.id}`
+          path: `/search/singer/${singer.id}`
         })
       },
-      selectList(){
-        this.setMusicList(this.songList)
+      selectList(list){
+        this.setMusicList(list)
         this.$router.push({
-          path: `/home/recommend/${this.songList.id}`
+          path: `/search/list/${list.id}`
         })
       },
       selectSong(){
 
-      },
-      listScroll() {
-        this.$emit('listScroll')
       },
       search(keyWorlds){
         this.searchShow = false
@@ -93,14 +90,16 @@
         this.searchSinger(keyWorlds)
         this.searchList(keyWorlds)
       },
-      searchMore(){
-        this.searchShow = false
-        this.haveMore = true
-        this.page += 30
+      searchMore () {
         this.isFirst = false
+        if (!this.haveMore) {
+          return
+        }
+        if (!this.songs.length) {
+          return
+        }
         this.searchSong(this.keyWorlds,this.page)
-        console.log(searchMore)
-        this.$emit('refresh')
+        this.page += 30
       },
       searchSong(keyWorlds,page){
         getSearchSongs(keyWorlds,page).then((res)=>{
@@ -114,13 +113,20 @@
                 return creatSong(music)
               })
             }else if(!this.isFirst){
+              let list = res.result.songs
+              if (!res.result.songs) {
+                this.haveMore = false
+                return
+              }
               let ret = []
-              ret = res.result.songs.map((music)=>{
-                return creatSong(music)
+              list.forEach((item) => {
+                ret.push(creatSong(item))
               })
               this.songs = this.songs.concat(ret)
+              this.$emit('refresh')
             }
           }
+          this.$emit('refresh')
         })
       },
       searchSinger(keyWorlds){
@@ -142,6 +148,18 @@
     },
     watch: {
       keyWorlds (val) {
+        if (val === '') {
+          this.songs = []
+          this.haveMore = false
+          return
+        }
+        this.singer={},
+        this.isFirst=true,
+        this.songList={},
+        this.songs = []
+        this.searchShow = true
+        this.page = 0
+        this.haveMore = true
         this.search(val)
       }
     },

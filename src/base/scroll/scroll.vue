@@ -6,7 +6,6 @@
 
 <script>
   import BScroll from 'better-scroll'
-
   export default {
     props: {
       probeType: {
@@ -17,31 +16,27 @@
         type: Boolean,
         default: true
       },
-      listenScroll: {
-        type: Boolean,
-        default: false
-      },
       data: {
         type: Array,
         default: null
       },
-      pullup: {
+      listenScroll: {
         type: Boolean,
         default: false
       },
-      beforeScroll: {
+      pullup: {
         type: Boolean,
         default: false
       },
       refreshDelay: {
         type: Number,
         default: 20
-      },
+      }
     },
-    mounted() {
+    mounted () {
       setTimeout(() => {
         this._initScroll()
-      }, 20)
+      })
     },
     methods: {
       _initScroll () {
@@ -84,7 +79,7 @@
       }
     },
     watch: {
-      data() {
+      data () {
         setTimeout(() => {
           this.refresh()
         }, this.refreshDelay)
@@ -93,6 +88,6 @@
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style>
 
 </style>

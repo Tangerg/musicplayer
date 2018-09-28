@@ -41,7 +41,7 @@
       }
     },
     created() {
-      this._initSingerDetail(this.singerInfo.id)
+      this._initSingerDetail()
     },
     computed:{
       ...mapGetters([
@@ -70,14 +70,13 @@
         this.$refs.list.$el.style.bottom = bottom
         this.$refs.list.refresh()
       },
-      _initSingerDetail(id){
-        if (!id){
+      _initSingerDetail(){
+        if (!this.singerInfo.id){
           this.$router.push('/home/singer')
           return
         }
-        getSongBySinger(id).then((res) => {
+        getSongBySinger(this.singerInfo.id).then((res) => {
           if(res.code === ERR_OK){
-            this.songList = []
             this.songList = res.hotSongs.map((music)=>{
               return creatSongList(music)
             })

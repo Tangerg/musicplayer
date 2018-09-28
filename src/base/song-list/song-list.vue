@@ -22,7 +22,7 @@
       props:{
         songs:{
           type:Array,
-          default:null
+          default:[]
         }
       },
       computed:{

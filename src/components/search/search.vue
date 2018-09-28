@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="search-result" v-show="query">
-          <suggest :keyWorlds="query" ref="suggest"></suggest>
+          <suggest :keyWorlds="query" @refresh="refresh" ref="suggest"></suggest>
         </div>
       </div>
     </scroll>
@@ -58,12 +58,18 @@
         this._getHotKey()
       },
       methods:{
+        refresh () {
+          setTimeout(() => {
+            this.$refs.scroll.refresh()
+          }, 20)
+        },
         searchMore(){
           this.$refs.suggest.searchMore()
         },
         _back(){
           this.$router.back()
           this.$refs.searchBox.clear()
+          this.query = ''
         },
         _getHotKey(){
           getHotKey().then((res)=>{

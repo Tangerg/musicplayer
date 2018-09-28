@@ -1,5 +1,5 @@
 <template>
-    <scroll class="singer-item">
+    <scroll class="singer-item" :data="singers">
       <ul>
         <li class="item-list" v-for="(singer,index) in singers" @click.stop="selectItem(singer, index)">
           <div class="avatar">

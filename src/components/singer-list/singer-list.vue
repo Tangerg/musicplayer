@@ -9,8 +9,8 @@
     </div>
     <div class="filter">筛选</div>
   </div>
-  <div class="container">
-      <singer-item :singers="singerDetail" @selectItem="selectSinger"></singer-item>
+  <div class="container" ref="container">
+      <singer-item :singers="singerDetail" @selectItem="selectSinger" ref="singer-item"></singer-item>
   </div>
 </div>
 </template>
@@ -22,8 +22,9 @@
   import {ERR_OK} from "../../common/js/config";
   import {creatSinger} from '../../common/classes/singer'
   import Scroll from '../../base/scroll/scroll'
-
+  /*import {playlistMixin} from '../../common/js/mixin'*/
   export default {
+    /*mixins:[playlistMixin],*/
     data(){
       return {
         singerDetail:[]

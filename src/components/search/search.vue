@@ -8,7 +8,11 @@
         <search-box ref="searchBox" @query="onQueryChange"></search-box>
       </div>
     </div>
-    <scroll class="search-scroll-wrapper" ref="scroll" :pullup="pullup" @scrollToEnd="searchMore">
+    <scroll class="search-scroll-wrapper"
+            :beforeScroll="beforeScroll"
+            ref="scroll"
+            :pullup="pullup"
+            @scrollToEnd="searchMore">
       <div ref="search">
         <div class="search-hots" v-show="!query">
           <p class="title">热门搜索</p>
@@ -20,21 +24,32 @@
           </span>
         </div>
         <div class="shortcut-wrapper" v-show="!query">
-          <div class="search-history">
+          <div class="search-history" v-show="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span class="clear">
+              <span class="clear" @click="showConfirm">
                   <i class="iconfont icon-lajitong"></i>
                 </span>
             </h1>
-            <!--<search-list></search-list>-->
+            <search-list
+              :searches="searchHistory"
+              @select="addQuery"
+              @delete="deleteSearchHistory"
+            ></search-list>
           </div>
         </div>
         <div class="search-result" v-show="query">
-          <suggest :keyWorlds="query" @refresh="refresh" ref="suggest"></suggest>
+          <suggest
+            :keyWorlds="query"
+            @refresh="refresh"
+            ref="suggest"
+            @select="saveSearch"
+          >
+          </suggest>
         </div>
       </div>
     </scroll>
+    <confirm ref="confirm" @confirm="clearSearchHistory" text="是否清空搜索历史？" confirmBtnText="清空"></confirm>
     <router-view></router-view>
   </div>
 </template>
@@ -44,11 +59,14 @@
   import Suggest from '../suggest/suggest'
   import SearchBox from '../../base/search-box/search-box'
   import SearchList from '../../base/search-list/search-list'
+  import Confirm from '../../base/confirm/confirm'
   import {ERR_OK} from "../../common/js/config";
   import {getHotKey} from '../../api/search'
+  import {mapActions,mapGetters} from 'vuex'
     export default {
       data(){
         return{
+          beforeScroll:true,
           pullup:true,
           HotKey:[],
           query:''
@@ -57,7 +75,23 @@
       created(){
         this._getHotKey()
       },
+      computed:{
+        ...mapGetters([
+          'searchHistory'
+        ])
+      },
       methods:{
+        ...mapActions([
+          'saveSearchHistory',
+          'deleteSearchHistory',
+          'clearSearchHistory'
+        ]),
+        showConfirm () {
+          this.$refs.confirm.show()
+        },
+        saveSearch(){
+          this.saveSearchHistory(this.query)
+        },
         refresh () {
           setTimeout(() => {
             this.$refs.scroll.refresh()
@@ -86,6 +120,7 @@
         },
       },
      components:{
+       Confirm,
        SearchBox,
        SearchList,
        Scroll,

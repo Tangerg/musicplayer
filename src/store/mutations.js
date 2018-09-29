@@ -31,6 +31,9 @@ const mutations = {
   [types.SET_PLAYING_MODE] (state, mode) {
     state.playMode = mode
   },
+  [types.SET_SEARCH_HISTORY] (state, history) {
+    state.searchHistory = history
+  },
 }
 
 export default mutations

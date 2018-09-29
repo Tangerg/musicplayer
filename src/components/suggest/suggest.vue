@@ -15,7 +15,7 @@
       </div>
     </div>
     <ul class="suggest-list" ref="suggestList" v-show="!searchShow">
-      <li class="suggest-item" v-for="(song,index) in songs" :key="index" @click="selectSong">
+      <li class="suggest-item" v-for="(song,index) in songs" :key="index" @click="selectSong(song)">
         <div class="icon">
           <i class="iconfont icon-yinle"></i>
         </div>
@@ -25,16 +25,19 @@
         </div>
       </li>
     </ul>
+    <div v-show="!haveMore && !songs.length && keyWorlds" class="no-result-wrapper">
+      抱歉，暂无搜索结果
+    </div>
   </div>
 </template>
 
 <script>
-  import {getSearchSongs, getSearchSuggest, getSongDetail,getSearchSinger,getSearchList} from '../../api/search'
+  import {getSearchSongs, getSongDetail,getSearchSinger,getSearchList} from '../../api/search'
   import {ERR_OK} from "../../common/js/config";
   import {creatSong} from "../../common/classes/song";
   import {creatSinger} from "../../common/classes/singer";
   import {createSearchMusicList} from "../../common/classes/musicList";
-  import {mapMutations} from 'vuex'
+  import {mapMutations,mapActions} from 'vuex'
   export default {
     props: {
       keyWorlds: {
@@ -66,6 +69,9 @@
         setSingerInfo:'SET_SINGER_INFO',
         setMusicList:'SET_MUSIC_LIST'
       }),
+      ...mapActions([
+        'insertSong'
+      ]),
       selectSinger(singer){
         this.setSingerInfo(singer)
         this.$router.push({
@@ -78,8 +84,12 @@
           path: `/search/list/${list.id}`
         })
       },
-      selectSong(){
-
+      selectSong(song){
+        getSongDetail(song.id).then((res) => {
+          song.image = res.songs[0].al.picUrl
+          this.insertSong(song)
+        })
+        this.$emit('select')
       },
       search(keyWorlds){
         this.searchShow = false
@@ -109,6 +119,7 @@
           }
           if(res.code === ERR_OK){
             if(this.isFirst){
+              this.page += 30
               this.songs = res.result.songs.map((music)=>{
                 return creatSong(music)
               })
@@ -123,7 +134,6 @@
                 ret.push(creatSong(item))
               })
               this.songs = this.songs.concat(ret)
-              this.$emit('refresh')
             }
           }
           this.$emit('refresh')
@@ -234,4 +244,11 @@
             white-space nowrap
             overflow hidden
             text-overflow ellipsis
+    .no-result-wrapper
+      position fixed
+      overflow hidden
+      left 50%
+      top 40vh
+      transform translatex(-50%)
+      color $color-text-black
 </style>

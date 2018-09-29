@@ -18,6 +18,8 @@ export const currentIndex = state => state.currentIndex
 
 export const sequenceList = state => state.sequenceList
 
+export const searchHistory = state => state.searchHistory
+
 export const currentSong = (state) => {
   return state.playList[state.currentIndex] || {}
 }

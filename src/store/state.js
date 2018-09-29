@@ -1,4 +1,5 @@
 import {Mode} from '../common/js/config'
+import {loadSearch, loadPlay, loadFavorite} from '../common/js/cache'
 const state = {
   singerCategory: 0,
   singerInfo:{},
@@ -9,7 +10,8 @@ const state = {
   isPlaying: true,
   fullScreen:false,
   currentIndex:-1,
-  playMode:Mode.sequence
+  playMode:Mode.sequence,
+  searchHistory:loadPlay(),
 }
 
 export default state

@@ -32,5 +32,6 @@ export function creatSong(music) {
     singer:singerName(music.artists),
     name:music.name,
     album:music.album.name,
+    image:music.album.picUrl
   })
 }

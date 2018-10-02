@@ -1,31 +1,36 @@
 <template>
-  <div class="rank-detail">
-    <div class="header">
-      <div class="back" @click="_back">
-        <i class="iconfont icon-left"></i>
+  <transition name="slide" mode="out-in">
+    <div class="rank-detail">
+      <div class="header">
+        <div class="back" @click="_back">
+          <i class="iconfont icon-left"></i>
+        </div>
+        <div class="text">
+          <h1 class="title"></h1>
+        </div>
       </div>
-      <div class="text">
-        <h1 class="title"></h1>
-      </div>
-    </div>
-    <scroll class="list" ref="list" :data="ListDetail">
-      <div class="music-list-wrapper">
-        <div class="bg-image" :style="bgImg">
-          <div class="filter"></div>
-          <div class="text">
-            <h2 class="list-title">{{listName}}</h2>
-            <p class="play-count">
-              <i class="iconfont icon-customer"></i>
-              共计播放{{playCount}}
-            </p>
+      <scroll class="list" ref="list" :data="ListDetail">
+        <div class="music-list-wrapper">
+          <div class="bg-image" :style="bgImg">
+            <div class="filter"></div>
+            <div class="text">
+              <h2 class="list-title">{{listName}}</h2>
+              <p class="play-count">
+                <i class="iconfont icon-customer"></i>
+                共计播放{{playCount}}
+              </p>
+            </div>
+          </div>
+          <div class="song-list-wrapper">
+            <song-list :songs="ListDetail" @select="selectItem" @selectAll="playAll"></song-list>
           </div>
         </div>
-        <div class="song-list-wrapper">
-          <song-list :songs="ListDetail" @select="selectItem" @selectAll="playAll"></song-list>
-        </div>
+      </scroll>
+      <div v-show="!ListDetail.length" class="loading-content">
+        <loading></loading>
       </div>
-    </scroll>
-  </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -33,6 +38,7 @@
   import {creatSongList} from "../../common/classes/song";
   import Scroll from '../../base/scroll/scroll'
   import SongList from '../../base/song-list/song-list'
+  import Loading from '../../base/loading/loading'
   import {playlistMixin} from '../../common/js/mixin'
   export default {
     mixins:[playlistMixin],
@@ -72,7 +78,8 @@
     },
     components:{
       SongList,
-      Scroll
+      Scroll,
+      Loading
     },
     methods:{
       ...mapActions([
@@ -85,7 +92,7 @@
       },
 
       _initRankList(list){
-        if (!this.rankList) {
+        if (!this.rankList.id) {
           this.$router.push('/home/rank')
           return
         }
@@ -113,6 +120,11 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
+  .slide-enter-active, .slide-leave-active
+    transition: all 0.3s
+  .slide-enter, .slide-leave-to
+    transform: translate3d(30%, 0, 0);
+    opacity: 0;
   .rank-detail
     position fixed
     z-index: 150
@@ -186,5 +198,10 @@
           border-radius 10px 10px 0 0
           position relative
           top -20px
+    .loading-content
+      position fixed
+      width 100%
+      top 70%
+      transform: translateY(-50%)
 </style>
 

@@ -68,6 +68,7 @@
         color $color-text-black
       .text
         font-size $font-size-medium
+        color $color-text-black
         font-weight bold
       .count
         font-size $font-size-small-x

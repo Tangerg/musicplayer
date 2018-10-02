@@ -1,57 +1,59 @@
 <template>
-  <div class="search" >
-    <div class="search-box-wrapper">
-      <div class="back" @click="_back">
-        <i class="iconfont icon-left"></i>
-      </div>
-      <div class="input-searchBox">
-        <search-box ref="searchBox" @query="onQueryChange"></search-box>
-      </div>
-    </div>
-    <scroll class="search-scroll-wrapper"
-            :beforeScroll="beforeScroll"
-            ref="scroll"
-            :pullup="pullup"
-            @scrollToEnd="searchMore">
-      <div ref="search">
-        <div class="search-hots" v-show="!query">
-          <p class="title">热门搜索</p>
-          <span class="search-hots-item"
-                v-for="(hotkey,index) in HotKey"
-                :key="index"
-                @click="addQuery(hotkey.first)">
-            {{hotkey.first}}
-          </span>
+  <transition name="search">
+    <div class="search" >
+      <div class="search-box-wrapper">
+        <div class="back" @click="_back">
+          <i class="iconfont icon-left"></i>
         </div>
-        <div class="shortcut-wrapper" v-show="!query">
-          <div class="search-history" v-show="searchHistory.length">
-            <h1 class="title">
-              <span class="text">搜索历史</span>
-              <span class="clear" @click="showConfirm">
-                  <i class="iconfont icon-lajitong"></i>
-                </span>
-            </h1>
-            <search-list
-              :searches="searchHistory"
-              @select="addQuery"
-              @delete="deleteSearchHistory"
-            ></search-list>
+        <div class="input-searchBox">
+          <search-box ref="searchBox" @query="onQueryChange"></search-box>
+        </div>
+      </div>
+      <scroll class="search-scroll-wrapper"
+              :beforeScroll="beforeScroll"
+              ref="scroll"
+              :pullup="pullup"
+              @scrollToEnd="searchMore">
+        <div ref="search">
+          <div class="search-hots" v-show="!query">
+            <p class="title">热门搜索</p>
+            <span class="search-hots-item"
+                  v-for="(hotkey,index) in HotKey"
+                  :key="index"
+                  @click="addQuery(hotkey.first)">
+              {{hotkey.first}}
+            </span>
+          </div>
+          <div class="shortcut-wrapper" v-show="!query">
+            <div class="search-history" v-show="searchHistory.length">
+              <h1 class="title">
+                <span class="text">搜索历史</span>
+                <span class="clear" @click="showConfirm">
+                    <i class="iconfont icon-lajitong1"></i>
+                  </span>
+              </h1>
+              <search-list
+                :searches="searchHistory"
+                @select="addQuery"
+                @delete="deleteSearchHistory"
+              ></search-list>
+            </div>
+          </div>
+          <div class="search-result" v-show="query">
+            <suggest
+              :keyWorlds="query"
+              @refresh="refresh"
+              ref="suggest"
+              @select="saveSearch"
+            >
+            </suggest>
           </div>
         </div>
-        <div class="search-result" v-show="query">
-          <suggest
-            :keyWorlds="query"
-            @refresh="refresh"
-            ref="suggest"
-            @select="saveSearch"
-          >
-          </suggest>
-        </div>
-      </div>
-    </scroll>
-    <confirm ref="confirm" @confirm="clearSearchHistory" text="是否清空搜索历史？" confirmBtnText="清空"></confirm>
-    <router-view></router-view>
-  </div>
+      </scroll>
+      <confirm ref="confirm" @confirm="clearSearchHistory" text="是否清空搜索历史？" confirmBtnText="清空"></confirm>
+      <router-view></router-view>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -132,6 +134,11 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
+  .search-enter-active, .search-leave-active
+    transition: all 0.3s;
+  .search-enter, .search-leave-to
+    transform: translate3d(50%, 0, 0);
+    opacity: 0;
   .search
     position fixed
     z-index 100
@@ -193,7 +200,7 @@
               flex 1
             .clear
               include extend-click()
-              .icon-lajitong
+              .icon-lajitong1
                 font-size $font-size-medium-x
                 color $color-text-gray-d
       .search-result

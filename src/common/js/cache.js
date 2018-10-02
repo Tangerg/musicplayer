@@ -65,7 +65,10 @@ export function savePlay(song) {
   storage.set(PLAY_KEY, songs)
   return songs
 }
-
+export function clearPlay() {
+  storage.remove(PLAY_KEY)
+  return []
+}
 export function loadPlay() {
   return storage.get(PLAY_KEY, [])
 }
@@ -88,6 +91,10 @@ export function deleteFavorite(song) {
   return songs
 }
 
+export function clearFavorite() {
+  storage.remove(FAVORITE_KEY)
+  return []
+}
 export function loadFavorite() {
   return storage.get(FAVORITE_KEY, [])
 }

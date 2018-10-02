@@ -52,18 +52,20 @@
         text-align center
         color $color-text-black
         img
+          height 55px
+          width 55px
           border-radius 3px
       .content
         flex 1
         margin-left 1%
-        height 50px
+        height 60px
         overflow hidden
         border-bottom: 1px solid $color-line-gray
         .name
           no-wrap()
           width: 90%;
-          height 50px
-          line-height 50px
+          height 60px
+          line-height 60px
           font-size $font-size-small-x
           color $color-text-black
 </style>

@@ -1,31 +1,36 @@
 <template>
-  <div class="music-list">
-      <div class="header">
-        <div class="back" @click="_back">
-          <i class="iconfont icon-left"></i>
+  <transition name="slide" mode="out-in">
+    <div class="music-list">
+        <div class="header" ref="header">
+          <div class="back" @click="_back">
+            <i class="iconfont icon-left"></i>
+          </div>
+          <div class="text">
+            <h1 class="title">{{headerTitle}}</h1>
+          </div>
         </div>
-        <div class="text">
-          <h1 class="title">{{headerTitle}}</h1>
-        </div>
-      </div>
-      <scroll class="list" ref="list" :data="ListDetail">
-        <div class="music-list-wrapper">
-          <div class="bg-image" :style="bgImg">
-            <div class="filter"></div>
-            <div class="text">
-              <h2 class="list-title">{{listName}}</h2>
-              <p class="play-count">
-                <i class="iconfont icon-customer"></i>
-                {{playCount}}
-              </p>
+        <scroll class="list" ref="list" :data="ListDetail" @scroll="scroll">
+          <div class="music-list-wrapper">
+            <div class="bg-image" :style="bgImg" ref="bgImage">
+              <div class="filter"></div>
+              <div class="text">
+                <h2 class="list-title">{{listName}}</h2>
+                <p class="play-count">
+                  <i class="iconfont icon-customer"></i>
+                  {{playCount}}
+                </p>
+              </div>
             </div>
-          </div>
-          <div class="song-list-wrapper">
-            <song-list :songs="ListDetail" @select="selectItem" @selectAll="playAll"></song-list>
-          </div>
+            <div class="song-list-wrapper">
+              <song-list :songs="ListDetail" @select="selectItem" @selectAll="playAll"></song-list>
+            </div>
+        </div>
+      </scroll>
+      <div v-show="!ListDetail.length" class="loading-content">
+        <loading></loading>
       </div>
-    </scroll>
-  </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -36,16 +41,25 @@
   import Scroll from '../../base/scroll/scroll'
   import SongList from '../../base/song-list/song-list'
   import {playlistMixin} from '../../common/js/mixin'
+  import Loading from '../../base/loading/loading'
+
+  const RESERVED_HEIGHT = 50
+
     export default {
       mixins:[playlistMixin],
       data() {
         return {
           ListDetail:[],
-          headerTitle: '歌单'
+          headerTitle: '歌单',
+          scrollY: 0,
         }
       },
       created(){
         this._initMusicList()
+      },
+      mounted () {
+        this.imageHeight = this.$refs.bgImage.clientHeight
+        this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT
       },
       computed:{
         ...mapGetters([
@@ -75,12 +89,17 @@
       },
       components:{
         SongList,
-        Scroll
+        Scroll,
+        Loading
       },
       methods:{
         ...mapActions([
-          'selectPlay'
+          'selectPlay',
+          'sequencePlay'
         ]),
+        scroll (pos) {
+          this.scrollY = pos.y
+        },
         handlePlaylist (playlist) {
           const bottom = playlist.length > 0 ? '8%' : ''
           this.$refs.list.$el.style.bottom = bottom
@@ -109,9 +128,25 @@
           })
         },
         playAll(){
-          this.selectPlay({
+          this.sequencePlay({
             list: this.ListDetail,
           })
+        }
+      },
+      watch: {
+        scrollY (newY) {
+          // let translateY = Math.max(this.minTranslateY, newY)
+          const percent = Math.abs(newY / this.imageHeight)
+          if (newY < (this.minTranslateY + RESERVED_HEIGHT - 20)) {
+            this.headerTitle = this.musicList.name
+          } else {
+            this.headerTitle = '歌单'
+          }
+          if (newY < 0) {
+            this.$refs.header.style.background = `rgba(212, 68, 57, ${percent})`
+          } else {
+            this.$refs.header.style.background = `rgba(212, 68, 57, 0)`
+          }
         }
       },
     }
@@ -120,6 +155,11 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
+  .slide-enter-active, .slide-leave-active
+    transition: all 0.3s
+  .slide-enter, .slide-leave-to
+    transform: translate3d(30%, 0, 0);
+    opacity: 0;
   .music-list
     position fixed
     z-index: 100
@@ -193,4 +233,9 @@
           border-radius 10px 10px 0 0
           position relative
           top -20px
+    .loading-content
+      position fixed
+      width 100%
+      top 70%
+      transform: translateY(-50%)
 </style>

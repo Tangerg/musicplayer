@@ -81,7 +81,7 @@
         background: $color-background-white;
         .text
           padding: 12px 15px;
-          line-height: 22px;
+          line-height: 30px;
           text-align: center;
           font-size: $font-size-medium-x;
           color: $color-text-black;

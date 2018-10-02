@@ -1,27 +1,32 @@
 <template>
-  <div class="singer-detail">
-    <div class="header">
-      <div class="back" @click="_back">
-        <i class="iconfont icon-left"></i>
+  <transition name="slide" mode="out-in">
+    <div class="singer-detail">
+      <div class="header">
+        <div class="back" @click="_back">
+          <i class="iconfont icon-left"></i>
+        </div>
+        <div class="text">
+          <h1 class="title">{{headerTitle}}</h1>
+        </div>
       </div>
-      <div class="text">
-        <h1 class="title">{{headerTitle}}</h1>
-      </div>
-    </div>
-    <scroll class="list" ref="list" :data="songList">
-      <div class="music-list-wrapper">
-        <div class="bg-image" :style="bgImg">
-          <div class="filter"></div>
-          <div class="text">
-            <h2 class="list-title">{{singerName}}</h2>
+      <scroll class="list" ref="list" :data="songList">
+        <div class="music-list-wrapper">
+          <div class="bg-image" :style="bgImg">
+            <div class="filter"></div>
+            <div class="text">
+              <h2 class="list-title">{{singerName}}</h2>
+            </div>
+          </div>
+          <div class="song-list-wrapper">
+            <song-list :songs="songList" @select="selectItem" @selectAll="playAll"></song-list>
           </div>
         </div>
-        <div class="song-list-wrapper">
-          <song-list :songs="songList" @select="selectItem" @selectAll="playAll"></song-list>
-        </div>
+      </scroll>
+      <div v-show="!songList.length" class="loading-content">
+        <loading></loading>
       </div>
-    </scroll>
-  </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -32,6 +37,7 @@
   import Scroll from '../../base/scroll/scroll'
   import SongList from '../../base/song-list/song-list'
   import {playlistMixin} from '../../common/js/mixin'
+  import Loading from '../../base/loading/loading'
   export default {
     mixins:[playlistMixin],
     data() {
@@ -59,7 +65,8 @@
     },
     components:{
       SongList,
-      Scroll
+      Scroll,
+      Loading
     },
     methods:{
       ...mapActions([
@@ -104,6 +111,11 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
+  .slide-enter-active, .slide-leave-active
+    transition: all 0.5s
+  .slide-enter, .slide-leave-to
+    transform: translate3d(30%, 0, 0);
+    opacity: 0;
   .singer-detail
     position fixed
     z-index: 150
@@ -177,4 +189,9 @@
           border-radius 10px 10px 0 0
           position relative
           top -20px
+    .loading-content
+      position fixed
+      width 100%
+      top 70%
+      transform: translateY(-50%)
 </style>

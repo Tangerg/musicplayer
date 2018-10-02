@@ -20,6 +20,10 @@ export const sequenceList = state => state.sequenceList
 
 export const searchHistory = state => state.searchHistory
 
+export const playHistory = state => state.playHistory
+
+export const favourateList = state => state.favourate
+
 export const currentSong = (state) => {
   return state.playList[state.currentIndex] || {}
 }

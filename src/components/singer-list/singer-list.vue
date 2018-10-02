@@ -1,18 +1,23 @@
 <template>
-<div class="singer-list">
-  <div class="header">
-    <div class="back" @click="_back">
-      <i class="iconfont icon-left"></i>
+  <transition name="list-fade">
+    <div class="singer-list">
+      <div class="header">
+        <div class="back" @click="_back">
+          <i class="iconfont icon-left"></i>
+        </div>
+        <div class="text">
+          <h1 class="title">{{title}}</h1>
+        </div>
+        <div class="filter">筛选</div>
+      </div>
+      <div class="container" ref="container">
+          <singer-item :singers="singerDetail" @selectItem="selectSinger" ref="singer-item"></singer-item>
+      </div>
+      <div v-show="!singerDetail.length" class="loading-content">
+        <loading></loading>
+      </div>
     </div>
-    <div class="text">
-      <h1 class="title">{{title}}</h1>
-    </div>
-    <div class="filter">筛选</div>
-  </div>
-  <div class="container" ref="container">
-      <singer-item :singers="singerDetail" @selectItem="selectSinger" ref="singer-item"></singer-item>
-  </div>
-</div>
+  </transition>
 </template>
 
 <script>
@@ -22,6 +27,7 @@
   import {ERR_OK} from "../../common/js/config";
   import {creatSinger} from '../../common/classes/singer'
   import Scroll from '../../base/scroll/scroll'
+  import Loading from '../../base/loading/loading'
   /*import {playlistMixin} from '../../common/js/mixin'*/
   export default {
     /*mixins:[playlistMixin],*/
@@ -100,7 +106,8 @@
     },
     components:{
       SingerItem,
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
@@ -108,6 +115,10 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   @import "../../common/stylus/mixin"
+  &.list-fade-enter-active, &.list-fade-leave-active
+    transition: all 0.3s
+  &.list-fade-enter, &.list-fade-leave-to
+    opacity: 0
   .singer-list
     position fixed
     z-index: 100
@@ -142,9 +153,13 @@
         text-align center
         font-size $font-size-small-x
         color $color-text-white
-
     .container
       overflow hidden
       width 100%
       height 100%
+    .loading-content
+      position fixed
+      width 100%
+      top 50%
+      transform: translateY(-50%)
 </style>

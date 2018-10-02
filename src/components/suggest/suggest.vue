@@ -24,6 +24,7 @@
           <p class="singer">{{song.singer}} - {{song.album}}</p>
         </div>
       </li>
+      <loading v-show="haveMore && keyWorlds"></loading>
     </ul>
     <div v-show="!haveMore && !songs.length && keyWorlds" class="no-result-wrapper">
       抱歉，暂无搜索结果
@@ -38,6 +39,7 @@
   import {creatSinger} from "../../common/classes/singer";
   import {createSearchMusicList} from "../../common/classes/musicList";
   import {mapMutations,mapActions} from 'vuex'
+  import Loading from '../../base/loading/loading'
   export default {
     props: {
       keyWorlds: {
@@ -123,6 +125,9 @@
               this.songs = res.result.songs.map((music)=>{
                 return creatSong(music)
               })
+              if(this.songs.length<30){
+                this.haveMore = false
+              }
             }else if(!this.isFirst){
               let list = res.result.songs
               if (!res.result.songs) {
@@ -173,6 +178,9 @@
         this.search(val)
       }
     },
+    components:{
+      Loading
+    }
   }
 </script>
 

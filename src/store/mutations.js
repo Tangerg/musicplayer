@@ -34,6 +34,12 @@ const mutations = {
   [types.SET_SEARCH_HISTORY] (state, history) {
     state.searchHistory = history
   },
+  [types.SET_PLAY_HISTORY] (state, song) {
+    state.playHistory = song
+  },
+  [types.SET_FAVOURATE_LIST] (state, song) {
+    state.favourate = song
+  },
 }
 
 export default mutations

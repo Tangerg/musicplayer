@@ -1,6 +1,7 @@
 <template>
   <div class="m-player" v-show="playList.length">
-    <div class="normal-player" v-show="fullScreen">
+    <transition name="normal">
+      <div class="normal-player" v-show="fullScreen">
       <div class="background">
         <div class="filter"></div>
         <img :src="currentSong.image" width="100%" height="100%">
@@ -15,21 +16,25 @@
         </div>
       </div>
       <div class="player-middle" @click="changeMiddle">
-        <div class="middle-front" v-show="currentShow === 'cd'">
-          <div class="cd-wrapper">
-            <div class="cd">
-              <img class="image" :src="currentSong.image" >
+        <transition name="middleL">
+          <div class="middle-front" v-show="currentShow === 'cd'">
+            <div class="cd-wrapper">
+              <div class="cd" :class="cdCls">
+                <img class="image" :src="currentSong.image" >
+              </div>
             </div>
           </div>
-        </div>
-        <scroll class="middle-behind" ref="lyricList" :data="currentLyric && currentLyric.lines" v-show="currentShow === 'lyric'">
-          <div class="lyric-wrapper">
-            <div class="currentLyric" v-if="currentLyric">
-              <p ref="lyricLine" class="text" :class="{'highLight':currentLineNum === index}"  v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
-              <p class="no-lyric"></p>
+        </transition>
+        <transition name="middleR">
+          <scroll class="middle-behind" ref="lyricList" :data="currentLyric && currentLyric.lines" v-show="currentShow === 'lyric'">
+            <div class="lyric-wrapper">
+              <div class="currentLyric" v-if="currentLyric">
+                <p ref="lyricLine" class="text" :class="{'highLight':currentLineNum === index}"  v-for="(line,index) in currentLyric.lines">{{line.txt}}</p>
+                <p class="no-lyric"></p>
+              </div>
             </div>
-          </div>
-        </scroll>
+          </scroll>
+        </transition>
       </div>
       <div class="player-bottom">
         <div class="progress-wrapper">
@@ -53,12 +58,14 @@
             <i @click="nextSong"class="iconfont icon-forward"></i>
           </div>
           <div class="icon i-right">
-            <i class="iconfont icon-iconfontxihuan"></i>
+            <i class="iconfont" :class="getFavIcon(currentSong)" @click="handleFav(currentSong)" ></i>
           </div>
         </div>
       </div>
     </div>
-    <div  class="mini-player" v-show="!fullScreen" @click="open">
+    </transition>
+    <transition name="mini">
+      <div  class="mini-player" v-show="!fullScreen" @click="open">
       <div class="icon">
         <img width="40" height="40" :src="currentSong.image">
       </div>
@@ -66,13 +73,15 @@
         <h2 class="name" v-html="currentSong.name"></h2>
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
-      <div class="control"></div>
+      <div class="control"><progress-circle :radius="radius" :percent="percent">
+        <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
+      </progress-circle></div>
       <div class="control">
-        <progress-circle :radius="radius" :percent="percent">
-          <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
-        </progress-circle>
+        <i class="iconfont icon-iconfontcaidan" @click.stop="showPlayList"></i>
       </div>
     </div>
+    </transition>
+    <play-list ref="playlist"></play-list>
     <audio id="music-audio" ref="audio" @canplay="ready" @error="error" @timeupdate="updataTime" @ended="end" autoplay></audio>
   </div>
 </template>
@@ -87,6 +96,7 @@
   import {shuffle} from '../../common/js/util'
   import Lyric from 'lyric-parser'
   import Scroll from '../../base/scroll/scroll'
+  import PlayList from '../playlist/playlist'
 
   export default {
     data(){
@@ -113,9 +123,12 @@
         'isPlaying',
         'currentIndex',
         'currentSong',
-        'playMode'
+        'playMode',
+        'favourateList'
       ]),
-
+      cdCls() {
+        return this.isPlaying ? 'play' : 'play pause'
+      },
       percent(){
         return this.currentTime/this.duration
       },
@@ -174,6 +187,34 @@
         setPlayingMode:'SET_PLAYING_MODE',
         setPlayList:'SET_PLAY_LIST'
       }),
+      ...mapActions([
+        'savePlayHistory',
+        'saveFavoriteSong',
+        'deleteFavoriteSong'
+      ]),
+      getFavIcon(song){
+        if(this.isFavSong(song)){
+          return 'icon-iconfontxihuan2'
+        }
+        return 'icon-iconfontxihuan'
+      },
+      handleFav(song){
+        if(this.isFavSong(song)){
+          this.deleteFavoriteSong(song)
+        }else{
+          this.saveFavoriteSong(song)
+        }
+
+      },
+      isFavSong(song){
+        const index = this.favourateList.findIndex((item) => {
+          return item.id === song.id
+        })
+        return index > -1
+      },
+      showPlayList(){
+        this.$refs.playlist.show()
+      },
       changeMode(){
         const playMode = (this.playMode+1) % 3
         this.setPlayingMode(playMode)
@@ -217,6 +258,9 @@
       },
       open(){
         this.setFullScreen(true)
+        if(this.currentLyric){
+          this.currentLyric.seek(currentTime * 1000)
+        }
       },
 
       handlePlay(){
@@ -283,6 +327,7 @@
 
       ready (){
         this.songReady = true
+        this.savePlayHistory(this.currentSong)
       },
       error(){
         this.songReady = true
@@ -319,6 +364,7 @@
       changeMiddle () {
         if (this.currentShow === 'cd') {
           this.currentShow = 'lyric'
+          this.currentLyric.seek(currentTime * 1000)
         } else {
           this.currentShow = 'cd'
         }
@@ -328,7 +374,8 @@
     components:{
       ProgressBar,
       ProgressCircle,
-      Scroll
+      Scroll,
+      PlayList
     }
 
   }
@@ -339,6 +386,16 @@
   @import "../../common/stylus/mixin"
   .m-player
     .normal-player
+      &.normal-enter-active, &.normal-leave-active
+        transition: all 0.4s
+        /*.player-top, .player-bottom
+          transition: all 0.4s cubic-bezier(0.86, 0.18, 0.82, 1.32)*/
+      &.normal-enter, &.normal-leave-to
+        opacity: 0
+        /*.player-top
+          transform: translate3d(0, -100px, 0)
+        .player-bottom
+          transform: translate3d(0, 100px, 0)*/
       position fixed
       z-index 150
       top 0
@@ -408,6 +465,12 @@
         bottom 25%
         white-space nowrap
         .middle-front
+          &.middleL-enter-active, &.middleL-leave-active {
+            transition: all 0.3s
+          }
+          &.middleL-enter, &.middleL-leave-to {
+            opacity: 0
+          }
           display inline-block
           vertical-align top
           position relative
@@ -430,6 +493,10 @@
               box-sizing border-box
               border 10px solid rgba(255, 255, 255, 0.1)
               border-radius 50%
+              &.play
+                animation: rotate 35s linear infinite
+              &.pause
+                animation-play-state: paused
               .image
                 position: relative;
                 width: 100%;
@@ -515,8 +582,11 @@
                 font-size 40px
             &.i-right
               text-align left
-
     .mini-player
+      &.mini-enter-active, &.mini-leave-active
+        transition: all 0.4s
+      &.mini-enter, &.mini-leave-to
+        opacity: 0
       display flex
       align-items center
       position fixed
@@ -532,11 +602,7 @@
         width: 40px
         padding: 0 10px 0 20px
         img
-          border-radius: 50%
-          &.play
-            animation: rotate 10s linear infinite
-          &.pause
-            animation-play-state: paused
+          border-radius 3px
       .text
         display: flex
         flex-direction: column
@@ -557,11 +623,22 @@
         flex: 0 0 30px
         width: 30px
         padding: 0 10px
-        .icon-play2, .icon-pause2
-          font-size: 30px
-          color: $color-background-d
         .iconfont
+          position relative
+          left -5px
+          top -3px
+        .icon-iconfontcaidan
+          font-size 40px
+          color $color-text-gray-d
+        .icon-play2, .icon-pause2
           position: absolute
           left: 0
           top: 0
+          font-size: 30px
+          color: $color-background-d
+  @keyframes rotate
+    0%
+      transform: rotate(0)
+    100%
+      transform: rotate(360deg)
 </style>

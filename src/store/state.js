@@ -11,7 +11,9 @@ const state = {
   fullScreen:false,
   currentIndex:-1,
   playMode:Mode.sequence,
-  searchHistory:loadPlay(),
+  searchHistory:loadSearch(),
+  playHistory:loadPlay(),
+  favourate:loadFavorite(),
 }
 
 export default state

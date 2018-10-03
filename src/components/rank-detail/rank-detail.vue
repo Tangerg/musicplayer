@@ -1,17 +1,22 @@
 <template>
   <transition name="slide" mode="out-in">
     <div class="rank-detail">
-      <div class="header">
+      <div class="header" ref="header">
         <div class="back" @click="_back">
           <i class="iconfont icon-left"></i>
         </div>
         <div class="text">
-          <h1 class="title"></h1>
+          <h1 class="title">{{headerTitle}}</h1>
         </div>
       </div>
-      <scroll class="list" ref="list" :data="ListDetail">
+      <scroll class="list"
+              @scroll="scroll"
+              :probe-type="probeType"
+              :listen-scroll="listenScroll"
+              :data="ListDetail"
+              ref="list">
         <div class="music-list-wrapper">
-          <div class="bg-image" :style="bgImg">
+          <div class="bg-image" :style="bgImg" ref="bgImage">
             <div class="filter"></div>
             <div class="text">
               <h2 class="list-title">{{listName}}</h2>
@@ -40,15 +45,24 @@
   import SongList from '../../base/song-list/song-list'
   import Loading from '../../base/loading/loading'
   import {playlistMixin} from '../../common/js/mixin'
+  const RESERVED_HEIGHT = 50
   export default {
     mixins:[playlistMixin],
     data() {
       return {
-        ListDetail:[],
+        ListDetail: [],
+        scrollY: 0,
+        headerTitle: '排行榜'
       }
     },
     created(){
       this._initRankList(this.rankList.tracks)
+      this.probeType = 3
+      this.listenScroll = true
+    },
+    mounted () {
+      this.imageHeight = this.$refs.bgImage.clientHeight
+      this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT
     },
     computed:{
       ...mapGetters([
@@ -85,6 +99,9 @@
       ...mapActions([
         'selectPlay'
       ]),
+      scroll (pos) {
+        this.scrollY = pos.y
+      },
       handlePlaylist (playlist) {
         const bottom = playlist.length > 0 ? '8%' : ''
         this.$refs.list.$el.style.bottom = bottom
@@ -113,6 +130,21 @@
         this.selectPlay({
           list: this.ListDetail,
         })
+      }
+    },
+    watch: {
+      scrollY (newY) {
+        const percent = Math.abs(newY / this.imageHeight)
+        if (newY < (this.minTranslateY + RESERVED_HEIGHT - 20)) {
+          this.headerTitle = this.rankList.name
+        } else {
+          this.headerTitle = '排行榜'
+        }
+        if (newY < 0) {
+          this.$refs.header.style.background = `rgba(212, 68, 57, ${percent})`
+        } else {
+          this.$refs.header.style.background = `rgba(212, 68, 57, 0)`
+        }
       }
     },
   }

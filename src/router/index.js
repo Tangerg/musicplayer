@@ -43,6 +43,11 @@ const Recommend = (resolve) => {
     resolve(module)
   })
 }
+const RecommendList = (resolve) => {
+  import('../components/recommend-list/recommend-list').then((module) => {
+    resolve(module)
+  })
+}
 const Singer = (resolve) => {
   import('../components/singer/singer').then((module) => {
     resolve(module)
@@ -114,15 +119,21 @@ export default new Router({
       children:[
         {
           path: '/',
-          redirect: '/home/recommend'
+          redirect: '/home/recommend',
         },
         {
           path:'/home/recommend',
           component:Recommend,
-          children:[{
-            path:':id',
-            component:MusicList
-          }]
+          children:[
+            {
+              path:':id',
+              component:MusicList
+            },
+            {
+              path:'/home/recommend/more',
+              component:RecommendList
+            }
+          ]
         },
         {
           path:'/home/singer',

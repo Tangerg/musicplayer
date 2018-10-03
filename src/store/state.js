@@ -3,6 +3,7 @@ import {loadSearch, loadPlay, loadFavorite} from '../common/js/cache'
 const state = {
   singerCategory: 0,
   singerInfo:{},
+  recommendList:[],
   musicList: {},
   playList:[],
   rankList:{},

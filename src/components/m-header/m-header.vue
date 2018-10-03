@@ -4,13 +4,13 @@
       <i class="iconfont icon-hamburg"></i>
     </div>
     <div class="header-center">
-      <span class="header-center-item" @click="goTo('/music')">
-        <i class="iconfont icon-customer"></i>
+      <span class="header-center-item" @click="goTo('/music')" :class="{on: '/music'===$route.path}">
+        <i class="iconfont icon-yinle"></i>
       </span>
-      <span class="header-center-item" @click="goTo('/home')">
-        <i class="iconfont icon-home"></i>
+      <span class="header-center-item" @click="goTo('/home')" :class="{on: '/home/recommend' ===$route.path || '/home/singer' ===$route.path || '/home/rank'===$route.path}">
+        <i class="iconfont icon-wangyiyunyinle"></i>
       </span>
-      <span class="header-center-item" @click="goTo('/mv')">
+      <span class="header-center-item" @click="goTo('/mv')" :class="{on: '/mv'===$route.path}">
         <i class="iconfont icon-fingerprint"></i>s
       </span>
     </div>
@@ -58,10 +58,15 @@
       align-items center
       padding-left 15%
       padding-right 15%
+      color rgba(255,255,255,0.7)
       .header-center-item
         flex 1
         align-items center
         text-align center
+        &.on
+          color rgba(255,255,255,1)
+        .icon-wangyiyunyinle
+          font-size 25px
     .header-right
       padding-right 5%
       text-align right

@@ -9,7 +9,12 @@
             <h1 class="title">{{headerTitle}}</h1>
           </div>
         </div>
-        <scroll class="list" ref="list" :data="ListDetail" @scroll="scroll">
+      <scroll class="list"
+              @scroll="scroll"
+              :probe-type="probeType"
+              :listen-scroll="listenScroll"
+              :data="ListDetail"
+              ref="list">
           <div class="music-list-wrapper">
             <div class="bg-image" :style="bgImg" ref="bgImage">
               <div class="filter"></div>
@@ -49,13 +54,15 @@
       mixins:[playlistMixin],
       data() {
         return {
-          ListDetail:[],
-          headerTitle: '歌单',
+          ListDetail: [],
           scrollY: 0,
+          headerTitle: '歌单'
         }
       },
       created(){
         this._initMusicList()
+        this.probeType = 3
+        this.listenScroll = true
       },
       mounted () {
         this.imageHeight = this.$refs.bgImage.clientHeight

@@ -4,6 +4,8 @@ export const singerInfo = state => state.singerInfo
 
 export const musicList = state => state.musicList
 
+export const recommendList = state => state.recommendList
+
 export const playList = state => state.playList
 
 export const rankList = state => state.rankList

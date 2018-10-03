@@ -27,7 +27,7 @@
       <loading v-show="haveMore && keyWorlds"></loading>
     </ul>
     <div v-show="!haveMore && !songs.length && keyWorlds" class="no-result-wrapper">
-      抱歉，暂无搜索结果
+      <no-result title="暂无搜索结果"></no-result>
     </div>
   </div>
 </template>
@@ -40,6 +40,7 @@
   import {createSearchMusicList} from "../../common/classes/musicList";
   import {mapMutations,mapActions} from 'vuex'
   import Loading from '../../base/loading/loading'
+  import NoResult from '../../base/no-result/no-result'
   export default {
     props: {
       keyWorlds: {
@@ -146,7 +147,7 @@
       },
       searchSinger(keyWorlds){
         getSearchSinger(keyWorlds).then((res)=>{
-          if(res.code === ERR_OK){
+          if(res.code === ERR_OK &&res.result.artistCount>0){
             let artists = res.result.artists[0]
             this.singer = creatSinger(artists)
           }
@@ -154,9 +155,9 @@
       },
       searchList(keyWorlds){
         getSearchList(keyWorlds).then((res)=>{
-          if(res.code === ERR_OK){
-            let musicList = res.result.playlists[0]
-            this.songList = createSearchMusicList(musicList)
+          if(res.code === ERR_OK && res.result.playlistCount>0){
+              let musicList = res.result.playlists[0]
+              this.songList = createSearchMusicList(musicList)
           }
         })
       }
@@ -179,7 +180,8 @@
       }
     },
     components:{
-      Loading
+      Loading,
+      NoResult
     }
   }
 </script>

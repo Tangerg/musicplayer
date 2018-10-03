@@ -3,20 +3,20 @@
     <scroll ref="scroll" class="recommend-content" :data="recommendlist&&recommendsong">
       <div>
         <div class="background-red"></div>
-        <div v-if="banners.length" class="slider-wrapper">
+        <div v-if="banners.length>0" class="slider-wrapper">
           <slider>
             <div v-for="banner in banners" :key="banner.id" class="slider-item">
               <img @load="loadImage" :src="banner.picUrl">
             </div>
           </slider>
         </div>
-        <div class="recommend-list">
-          <h1 class="list-title">
+        <div class="recommend-list" v-show="recommendlist.length>0">
+          <h1 class="list-title" >
             推荐歌单
             <i class="iconfont icon-iconfontqianjin-copy"></i>
           </h1>
           <ul class="items">
-            <li v-for="songList in recommendlist" :key="songList.id" class="item" @click="_chickList(songList)">
+            <li v-for="songList in recommendlistNine" :key="songList.id" class="item" @click="_chickList(songList)">
               <div class="icon">
                 <div class="gradients"></div>
                 <img @load="loadImage" v-lazy="songList.picUrl" alt="">
@@ -31,7 +31,7 @@
             </li>
           </ul>
         </div>
-        <div class="recommend-list">
+        <div class="recommend-list" v-show="recommendsong.length>0">
           <h1 class="list-title">
             推荐歌曲
             <i class="iconfont icon-iconfontqianjin-copy"></i>
@@ -68,6 +68,7 @@
       return{
         banners:[],
         recommendlist: [],
+        recommendlistNine: [],
         recommendsong: []
       }
     },
@@ -79,7 +80,14 @@
     methods:{
       ...mapMutations({
         setMuiscList: 'SET_MUSIC_LIST',
+        setRecommendList:'SET_RECOMMEND_LIST'
       }),
+      recListMore(){
+        this.$router.push({
+          path: '/home/recommend/more'
+        })
+        this.setRecommendList(this.recommendlist)
+      },
       handlePlaylist (playlist) {
         const bottom = playlist.length > 0 ? '8%' : ''
         this.$refs.recommend.style.bottom = bottom
@@ -104,13 +112,14 @@
             this.recommendlist = res.result.map((musiclist)=>{
               return createMusicList(musiclist)
             })
+            this.recommendlistNine = this.recommendlist.slice(0,9)
           }
         })
       },
       _initRecommendSong(){
         getRecommendSong().then((res) => {
           if(res.code === ERR_OK){
-            this.recommendsong = res.result
+            this.recommendsong = res.result.slice(0,9)
           }
         })
       },

@@ -1,7 +1,7 @@
 <template>
   <transition name="slide" mode="out-in">
     <div class="singer-detail">
-      <div class="header">
+      <div class="header" ref="header">
         <div class="back" @click="_back">
           <i class="iconfont icon-left"></i>
         </div>
@@ -9,9 +9,14 @@
           <h1 class="title">{{headerTitle}}</h1>
         </div>
       </div>
-      <scroll class="list" ref="list" :data="songList">
+      <scroll class="list"
+              @scroll="scroll"
+              :probe-type="probeType"
+              :listen-scroll="listenScroll"
+              :data="songList"
+              ref="list">
         <div class="music-list-wrapper">
-          <div class="bg-image" :style="bgImg">
+          <div class="bg-image" :style="bgImg" ref="bgImage">
             <div class="filter"></div>
             <div class="text">
               <h2 class="list-title">{{singerName}}</h2>
@@ -38,16 +43,26 @@
   import SongList from '../../base/song-list/song-list'
   import {playlistMixin} from '../../common/js/mixin'
   import Loading from '../../base/loading/loading'
+
+  const RESERVED_HEIGHT = 50
+
   export default {
     mixins:[playlistMixin],
     data() {
       return {
         songList:[],
-        headerTitle: '歌手',
+        scrollY: 0,
+        headerTitle: '歌手'
       }
     },
     created() {
       this._initSingerDetail()
+      this.probeType = 3
+      this.listenScroll = true
+    },
+    mounted () {
+      this.imageHeight = this.$refs.bgImage.clientHeight
+      this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT
     },
     computed:{
       ...mapGetters([
@@ -72,6 +87,9 @@
       ...mapActions([
         'selectPlay'
       ]),
+      scroll (pos) {
+        this.scrollY = pos.y
+      },
       handlePlaylist (playlist) {
         const bottom = playlist.length > 0 ? '8%' : ''
         this.$refs.list.$el.style.bottom = bottom
@@ -103,6 +121,22 @@
         this.selectPlay({
           list: this.songList,
         })
+      }
+    },
+    watch: {
+      scrollY (newY) {
+        // let translateY = Math.max(this.minTranslateY, newY)
+        const percent = Math.abs(newY / this.imageHeight)
+        if (newY < (this.minTranslateY + RESERVED_HEIGHT - 20)) {
+          this.headerTitle = this.singerInfo.name
+        } else {
+          this.headerTitle = '歌手'
+        }
+        if (newY < 0) {
+          this.$refs.header.style.background = `rgba(212, 68, 57, ${percent})`
+        } else {
+          this.$refs.header.style.background = `rgba(212, 68, 57, 0)`
+        }
       }
     },
   }

@@ -44,6 +44,7 @@ export default {
 </script>
 
 <style>
+@import "common/iconfont/iconfont.css";
 #app {
   position: fixed;
   top: 0;

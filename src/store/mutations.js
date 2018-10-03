@@ -7,6 +7,9 @@ const mutations = {
   [types.SET_SINGER_CATEGORY] (state, category) {
     state.singerCategory = category
   },
+  [types.SET_RECOMMEND_LIST] (state, musicList) {
+    state.recommendList = musicList
+  },
   [types.SET_MUSIC_LIST] (state, musicList) {
     state.musicList = musicList
   },

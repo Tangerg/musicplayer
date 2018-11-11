@@ -73,9 +73,11 @@
         <h2 class="name" v-html="currentSong.name"></h2>
         <p class="desc" v-html="currentSong.singer"></p>
       </div>
-      <div class="control"><progress-circle :radius="radius" :percent="percent">
+      <div class="control">
+        <progress-circle :radius="radius" :percent="percent">
         <i @click.stop="handlePlay" class="iconfont" :class="miniPlayIcon"></i>
-      </progress-circle></div>
+        </progress-circle>
+      </div>
       <div class="control">
         <i class="iconfont icon-iconfontcaidan" @click.stop="showPlayList"></i>
       </div>
@@ -156,8 +158,11 @@
         if (newVal.id === oldVal.id) {
           return
         }
-        this.$refs.audio.pause()
-        this.$refs.audio.currentTime = 0
+        if(oldVal.id){
+          this.$refs.audio.pause()
+          this.$refs.audio.currentTime = 0
+        }
+
         this._getPlaySong(newVal.id)
         if(this.currentLyric){
           this.currentLyric.stop()

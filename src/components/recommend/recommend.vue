@@ -79,7 +79,7 @@
     },
     methods:{
       ...mapMutations({
-        setMuiscList: 'SET_MUSIC_LIST',
+        setMusicList: 'SET_MUSIC_LIST',
         setRecommendList:'SET_RECOMMEND_LIST'
       }),
       recListMore(){
@@ -124,7 +124,7 @@
         })
       },
       _chickList(songList){
-        this.setMuiscList(songList)
+        this.setMusicList(songList)
         this.$router.push({
           path: `/home/recommend/${songList.id}`
         })
